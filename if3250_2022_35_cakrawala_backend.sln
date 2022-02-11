@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CAB5
 		Scripts\start-dev.bat = Scripts\start-dev.bat
 		Scripts\start-prod.bat = Scripts\start-prod.bat
 		Scripts\stop-dev.bat = Scripts\stop-dev.bat
+		Scripts\stop-prod.bat = Scripts\stop-prod.bat
 	EndProjectSection
 EndProject
 Global
