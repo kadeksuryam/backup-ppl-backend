@@ -11,8 +11,8 @@ using if3250_2022_35_cakrawala_backend.Data;
 namespace if3250_2022_35_cakrawala_backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220208202502_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220211034926_InititalCreate")]
+    partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
