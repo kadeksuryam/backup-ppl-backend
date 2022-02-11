@@ -1,4 +1,4 @@
-﻿version: '3.4'
+version: '3.4'
 
 services:
     postgresql_db:
@@ -12,8 +12,6 @@ services:
         restart: always
         volumes:
             - database-data:/var/lib/postgresql/data/
-        networks:
-            - app-network
     
     pgadmin:
         image: dpage/pgadmin4
@@ -25,25 +23,7 @@ services:
         restart: always
         volumes: 
             - pgadmin:/root/.pgadmin
-        networks:
-            - app-network
-
-    server:
-        build:
-            context: ./
-        ports:
-            - "80:80"
-            - "443:443"
-        restart: unless-stopped
-        links:
-            - postgresql_db
-        networks:
-            - app-network
 
 volumes:
     database-data:
     pgadmin:
-
-networks:
-  app-network:
-    driver: bridge
