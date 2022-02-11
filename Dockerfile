@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["if3250_2022_35_cakrawala_backend.csproj", "."]
-RUN dotnet restore "./if3250_2022_35_cakrawala_backend.csproj"
+COPY ["Service/Service.csproj", "."]
+RUN dotnet restore "./Service.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "if3250_2022_35_cakrawala_backend.csproj" -c Release -o /app/build
+RUN dotnet build "Service.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "if3250_2022_35_cakrawala_backend.csproj" -c Release -o /app/publish
+RUN dotnet publish "Service.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "if3250_2022_35_cakrawala_backend.dll", "--environment=Development"]
+ENTRYPOINT ["dotnet", "Service.dll", "--environment=Development"]

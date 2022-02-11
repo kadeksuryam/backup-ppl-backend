@@ -10,6 +10,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Tests\bin\**" />
+    <Compile Remove="Tests\obj\**" />
+    <Content Remove="Tests\bin\**" />
+    <Content Remove="Tests\obj\**" />
+    <EmbeddedResource Remove="Tests\bin\**" />
+    <EmbeddedResource Remove="Tests\obj\**" />
+    <None Remove="Tests\bin\**" />
+    <None Remove="Tests\obj\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.2">
       <PrivateAssets>all</PrivateAssets>

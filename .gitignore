@@ -32,6 +32,22 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Build results
+Tests/[Dd]ebug/
+Tests/[Dd]ebugPublic/
+Tests/[Rr]elease/
+Tests/[Rr]eleases/
+Tests/x64/
+Tests/x86/
+Tests/[Ww][Ii][Nn]32/
+Tests/[Aa][Rr][Mm]/
+Tests/[Aa][Rr][Mm]64/
+Tests/bld/
+Tests/[Bb]in/
+Tests/[Oo]bj/
+Tests/[Ll]og/
+Tests/[Ll]ogs/
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Uncomment if you have tasks that create the project's static files in wwwroot
