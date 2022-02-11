@@ -24,7 +24,7 @@
       "publishAllPorts": true,
       "useSSL": true
     },
-    "Service": {
+    "App": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

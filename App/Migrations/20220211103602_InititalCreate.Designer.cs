@@ -8,10 +8,10 @@ using if3250_2022_35_cakrawala_backend.Data;
 
 #nullable disable
 
-namespace Service.Migrations
+namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220211062802_InititalCreate")]
+    [Migration("20220211103602_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

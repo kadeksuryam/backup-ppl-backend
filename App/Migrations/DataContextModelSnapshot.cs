@@ -7,7 +7,7 @@ using if3250_2022_35_cakrawala_backend.Data;
 
 #nullable disable
 
-namespace Service.Migrations
+namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
     partial class DataContextModelSnapshot : ModelSnapshot
