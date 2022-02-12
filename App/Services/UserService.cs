@@ -22,10 +22,8 @@
         {
             if (await IsUsernameTaken(dto.Username))
             {
-                Console.WriteLine("TEST");
                 throw new HttpStatusCodeException(HttpStatusCode.Conflict, "Username '" + dto.Username + "' is already taken");
             }
-            Console.WriteLine("TEST");
             var user = _mapper.Map<User>(dto);
 
             user.EncryptedPassword = BCrypt.HashPassword(dto.Password);
