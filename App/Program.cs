@@ -1,6 +1,7 @@
 using App.Data;
 using App.Helpers;
 using App.Repositories;
+using App.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -18,7 +19,10 @@ var builder = WebApplication.CreateBuilder(args);
 
     services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection")));
     services.AddScoped<IDataContext>(provider => provider.GetService<DataContext>());
-    services.AddScoped<UserRepository>();
+    services.AddScoped<IUserRepository, UserRepository>();
+    services.AddScoped<IUserService, UserService>();
+    services.AddAutoMapper(typeof(Program));
+
 
     services.AddSwaggerGen(c =>
     {
@@ -43,6 +47,7 @@ using (var scope = app.Services.CreateScope())
           .AllowAnyMethod()
           .AllowAnyHeader());
 
+    app.UseMiddleware<CustomExceptionMiddleware>();
     app.MapControllers();
 
 }

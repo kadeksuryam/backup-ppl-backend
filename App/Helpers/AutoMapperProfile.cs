@@ -1,4 +1,6 @@
-﻿using AutoMapper;
+﻿using App.DTOs.Requests;
+using App.Models;
+using AutoMapper;
 
 namespace App.Helpers
 {
@@ -6,6 +8,11 @@ namespace App.Helpers
     {
         public AutoMapperProfile()
         {
+            CreateMap<RegisterRequestDTO, User>()
+                .ForMember(dest =>
+                    dest.DisplayName,
+                    opt => opt.MapFrom(src => src.Name));
         }
+
     }
 }

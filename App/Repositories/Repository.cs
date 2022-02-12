@@ -1,54 +1,58 @@
-﻿using App.Models;
+﻿using App.Data;
+using App.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace App.Repositories
 {
-    public abstract class Repository<TEntity, TContext> : IRepository<TEntity>
-        where TEntity : class, IEntity
-        where TContext : DbContext
+    public abstract class Repository : IUserRepository
     {
-        private readonly TContext _context;
-        public Repository(TContext context)
+        private readonly IDataContext _context;
+        public Repository(IDataContext context)
         {
             this._context = context;
         }
-        public async Task<TEntity> Add(TEntity entity)
+        public async Task<User> Add(User entity)
         {
-            _context.Set<TEntity>().Add(entity);
+            _context.Users.Add(entity);
             await _context.SaveChangesAsync();
             return entity;
         }
 
-        public async Task<TEntity> Delete(int id)
+        public async Task<User> Delete(int id)
         {
-            var entity = await _context.Set<TEntity>().FindAsync(id);
+            var entity = await _context.Users.FindAsync(id);
             if (entity == null)
             {
                 return entity;
             }
 
-            _context.Set<TEntity>().Remove(entity);
+            _context.Users.Remove(entity);
             await _context.SaveChangesAsync();
 
             return entity;
         }
 
-        public async Task<TEntity> Get(int id)
+        public async Task<User> Get(int id)
         {
-            return await _context.Set<TEntity>().FindAsync(id);
+            return await _context.Users.Where(b => b.Id == id)
+                    .FirstAsync();
         }
 
-        public async Task<List<TEntity>> GetAll()
+        public async Task<IEnumerable<User>> GetAll()
         {
-            return await _context.Set<TEntity>().ToListAsync();
+            return await _context.Users.ToListAsync();
         }
 
-        public async Task<TEntity> Update(TEntity entity)
+        public async Task<User> Update(User entity)
         {
-            _context.Entry(entity).State = EntityState.Modified;
+            _context.Users.Update(entity);
             await _context.SaveChangesAsync();
             return entity;
         }
 
+        public async Task<User> Get(string username)
+        {
+            return await _context.Users.FindAsync(username);
+        }
     }
 }
