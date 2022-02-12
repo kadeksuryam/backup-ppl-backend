@@ -1,0 +1,54 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "App", "App\App.csproj", "{F3F39A6E-5A13-43F6-9951-A5BDB1F872DE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{33C15679-BF09-432F-B30F-ED37FFA7EAAA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64BC84F7-133C-4562-A7C5-CF273D58B855}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		.gitignore = .gitignore
+		.gitlab-ci.yml = .gitlab-ci.yml
+		docker-compose.dev.yml = docker-compose.dev.yml
+		docker-compose.yml = docker-compose.yml
+		Dockerfile = Dockerfile
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CAB5FB8A-018D-4AA6-A203-55CC0476B408}"
+	ProjectSection(SolutionItems) = preProject
+		Scripts\migrate.bat = Scripts\migrate.bat
+		Scripts\start-dev.bat = Scripts\start-dev.bat
+		Scripts\start-prod.bat = Scripts\start-prod.bat
+		Scripts\stop-dev.bat = Scripts\stop-dev.bat
+		Scripts\stop-prod.bat = Scripts\stop-prod.bat
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F3F39A6E-5A13-43F6-9951-A5BDB1F872DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3F39A6E-5A13-43F6-9951-A5BDB1F872DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3F39A6E-5A13-43F6-9951-A5BDB1F872DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3F39A6E-5A13-43F6-9951-A5BDB1F872DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33C15679-BF09-432F-B30F-ED37FFA7EAAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33C15679-BF09-432F-B30F-ED37FFA7EAAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33C15679-BF09-432F-B30F-ED37FFA7EAAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33C15679-BF09-432F-B30F-ED37FFA7EAAA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CAB5FB8A-018D-4AA6-A203-55CC0476B408} = {64BC84F7-133C-4562-A7C5-CF273D58B855}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6AB08F28-0C5B-4F5D-90C2-D4A6AFF5178F}
+	EndGlobalSection
+EndGlobal
