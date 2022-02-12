@@ -34,11 +34,13 @@ namespace App.Models.Config
 
             builder.Property(b => b.Balance)
                 .IsRequired()
-                .HasColumnName("balance");
+                .HasColumnName("balance")
+                .HasDefaultValue(0);
 
             builder.Property(b => b.Exp)
                 .IsRequired()
-                .HasColumnName("exp");
+                .HasColumnName("exp")
+                .HasDefaultValue(0);
         }
     }
 }

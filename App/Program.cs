@@ -18,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 
     services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection")));
     services.AddScoped<IDataContext>(provider => provider.GetService<DataContext>());
-    services.AddScoped<IUserRepository, UserRepository>();
+    services.AddScoped<UserRepository>();
 
     services.AddSwaggerGen(c =>
     {
