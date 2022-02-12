@@ -1,6 +1,6 @@
-﻿using if3250_2022_35_cakrawala_backend.Models;
+﻿using App.Models;
 
-namespace if3250_2022_35_cakrawala_backend.Repositories
+namespace App.Repositories
 {
     public interface IUserRepository
     {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace if3250_2022_35_cakrawala_backend.Models.Config
+namespace App.Models.Config
 {
     public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
     {

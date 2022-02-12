@@ -1,8 +1,8 @@
-﻿using if3250_2022_35_cakrawala_backend.Data;
-using if3250_2022_35_cakrawala_backend.Models;
+﻿using App.Data;
+using App.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace if3250_2022_35_cakrawala_backend.Repositories
+namespace App.Repositories
 {
     public class UserRepository : IUserRepository
     {

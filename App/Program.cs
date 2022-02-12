@@ -1,5 +1,5 @@
-using if3250_2022_35_cakrawala_backend.Data;
-using if3250_2022_35_cakrawala_backend.Repositories;
+using App.Data;
+using App.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

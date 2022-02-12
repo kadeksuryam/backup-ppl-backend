@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace if3250_2022_35_cakrawala_backend.Models
+namespace App.Models
 {
     public class User
     {
