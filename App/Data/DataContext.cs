@@ -1,8 +1,8 @@
-﻿using if3250_2022_35_cakrawala_backend.Models;
-using if3250_2022_35_cakrawala_backend.Models.Config;
+﻿using App.Models;
+using App.Models.Config;
 using Microsoft.EntityFrameworkCore;
 
-namespace if3250_2022_35_cakrawala_backend.Data
+namespace App.Data
 {
     public class DataContext: DbContext, IDataContext
     {

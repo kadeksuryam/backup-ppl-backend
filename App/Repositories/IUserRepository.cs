@@ -1,12 +1,14 @@
-﻿using if3250_2022_35_cakrawala_backend.Models;
+﻿using App.Models;
 
-namespace if3250_2022_35_cakrawala_backend.Repositories
+namespace App.Repositories
 {
     public interface IUserRepository
     {
-        Task<User> Get(int id);
         Task<IEnumerable<User>> GetAll();
-        Task Add(User user);
-        Task Update(User user);
+        Task<User> Get(int id);
+        Task<User> Add(User entity);
+        Task<User> Update(User entity);
+        Task<User> Delete(int id);
+        Task<User> Get(string username);
     }
 }

@@ -1,19 +1,16 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace if3250_2022_35_cakrawala_backend.Models
+﻿namespace App.Models
 {
-    public class User
+    public class User : IEntity
     {
         public uint Id { get; set; }
 
-        public string UserName { get; set; }
+        public string UserName { get; set; } = string.Empty;
 
-        public string EncryptedPassword { get; set; }
+        public string EncryptedPassword { get; set; } = string.Empty;
 
-        public string DisplayName { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
 
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         public uint Balance { get; set; }
 

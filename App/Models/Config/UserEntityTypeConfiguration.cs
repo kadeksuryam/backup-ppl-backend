@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace if3250_2022_35_cakrawala_backend.Models.Config
+namespace App.Models.Config
 {
     public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
     {
@@ -34,11 +34,13 @@ namespace if3250_2022_35_cakrawala_backend.Models.Config
 
             builder.Property(b => b.Balance)
                 .IsRequired()
-                .HasColumnName("balance");
+                .HasColumnName("balance")
+                .HasDefaultValue(0);
 
             builder.Property(b => b.Exp)
                 .IsRequired()
-                .HasColumnName("exp");
+                .HasColumnName("exp")
+                .HasDefaultValue(0);
         }
     }
 }
