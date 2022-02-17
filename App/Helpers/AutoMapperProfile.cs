@@ -1,4 +1,5 @@
 ﻿using App.DTOs.Requests;
+using App.DTOs.Responses;
 using App.Models;
 using AutoMapper;
 
@@ -12,6 +13,8 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.DisplayName,
                     opt => opt.MapFrom(src => src.Name));
+
+            CreateMap<User, LoginResponseDTO>();
         }
 
     }
