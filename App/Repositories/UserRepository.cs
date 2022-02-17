@@ -33,7 +33,7 @@ namespace App.Repositories
             return entity;
         }
 
-        public async Task<User> Get(int id)
+        public async Task<User> GetById(uint id)
         {
             return await _context.Users.Where(b => b.Id == id).FirstAsync();
         }
@@ -54,6 +54,11 @@ namespace App.Repositories
         public async Task<User> Get(string username)
         {
             return await _context.Users.FindAsync(username);
+        }
+
+        public async Task<User> GetByEmail(string email)
+        {
+            return await _context.Users.Where(b => b.Email == email).FirstOrDefaultAsync();
         }
     }
 }
