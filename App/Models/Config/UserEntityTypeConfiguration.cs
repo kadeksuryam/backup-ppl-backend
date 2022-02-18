@@ -8,8 +8,12 @@ namespace App.Models.Config
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.ToTable("users");
-            builder.HasKey(e => e.UserName);
+            builder.HasKey(e => e.Id);
+
+            // Uniqueness configuration
+            builder.HasIndex(e => e.Id).IsUnique();
             builder.HasIndex(e => e.UserName).IsUnique();
+            builder.HasIndex(e => e.Email).IsUnique();
 
             builder.Property(b => b.Id)
                 .IsRequired()
