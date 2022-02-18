@@ -1,3 +1,4 @@
+using App.Authorization;
 using App.Data;
 using App.Helpers;
 using App.Repositories;
@@ -21,13 +22,41 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<IDataContext>(provider => provider.GetService<DataContext>());
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IBcryptWrapper, BcryptWrapper>();
     services.AddAutoMapper(typeof(Program));
 
 
     services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "Cakrawala Id API", Version = "v1" });
+
+        c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+        {
+            In = ParameterLocation.Header,
+            Description = "Please enter token",
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            BearerFormat = "JWT",
+            Scheme = "bearer"
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type=ReferenceType.SecurityScheme,
+                        Id="Bearer"
+                    }
+                },
+                new string[]{}
+            }
+        });
     });
+
+    services.AddScoped<IJwtUtils, JwtUtils>();
 }
 
 var app = builder.Build();
@@ -48,8 +77,10 @@ using (var scope = app.Services.CreateScope())
           .AllowAnyHeader());
 
     app.UseMiddleware<CustomExceptionMiddleware>();
-    app.MapControllers();
 
+    app.UseMiddleware<JwtMiddleware>();
+
+    app.MapControllers();
 }
 
 app.Run();
