@@ -41,6 +41,17 @@ namespace App.Models.Config
                 .IsRequired()
                 .HasColumnName("exp")
                 .HasDefaultValue(0);
+
+            builder.Property(b => b.Level)
+                .IsRequired()
+                .HasColumnName("level")
+                .HasDefaultValue(1); // New user starts from level 1
+
+            builder.Property(b => b.Type)
+               .IsRequired()
+               .HasColumnName("login_type")
+               .HasDefaultValue(User.LoginType.Standard)
+               .HasConversion<string>();
         }
     }
 }
