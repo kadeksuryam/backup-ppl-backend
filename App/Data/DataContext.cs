@@ -8,6 +8,8 @@ namespace App.Data
     {
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Level> Levels { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
@@ -16,6 +18,7 @@ namespace App.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserEntityTypeConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(LevelEntityTypeConfiguration).Assembly);
         }
         #endregion
     }
