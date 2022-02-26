@@ -21,6 +21,10 @@ namespace App.Models.Config
                 .IsRequired()
                 .HasColumnName("required_exp")
                 .HasDefaultValue(0);
+
+            builder.HasMany(l => l.Users)
+                .WithOne(u => u.Level)
+                .HasForeignKey(l => l.LevelId);
         }
     }
 }

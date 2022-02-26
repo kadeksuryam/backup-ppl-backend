@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220222081200_InititalCreate")]
+    [Migration("20220226054531_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,12 +88,34 @@ namespace App.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("LevelId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("levelId");
+
                     b.HasKey("UserName");
+
+                    b.HasIndex("LevelId");
 
                     b.HasIndex("UserName")
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("App.Models.User", b =>
+                {
+                    b.HasOne("App.Models.Level", "Level")
+                        .WithMany("Users")
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Level");
+                });
+
+            modelBuilder.Entity("App.Models.Level", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

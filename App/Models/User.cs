@@ -1,4 +1,6 @@
-﻿namespace App.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace App.Models
 {
     public class User : IEntity
     {
@@ -15,6 +17,11 @@
         public uint Balance { get; set; }
 
         public uint Exp { get; set; }
+
+        public uint LevelId { get; set; }
+
+        [ForeignKey("LevelId")]
+        public Level? Level { get; set; }
 
     } 
 }
