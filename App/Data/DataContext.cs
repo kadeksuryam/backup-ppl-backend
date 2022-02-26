@@ -13,6 +13,10 @@ namespace App.Data
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging();
+        }
 
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)

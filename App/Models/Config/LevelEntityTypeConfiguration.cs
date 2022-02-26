@@ -8,6 +8,9 @@ namespace App.Models.Config
         public void Configure(EntityTypeBuilder<Level> builder)
         {
             builder.ToTable("levels");
+            builder.HasKey(b => b.Id);
+            builder.HasIndex(b => b.Id).IsUnique();
+
             builder.Property(b => b.Id)
                 .IsRequired()
                 .HasColumnName("id")
@@ -25,6 +28,39 @@ namespace App.Models.Config
             builder.HasMany(l => l.Users)
                 .WithOne(u => u.Level)
                 .HasForeignKey(l => l.LevelId);
+
+            AddSeed(builder);
+        }
+
+        public void AddSeed(EntityTypeBuilder<Level> builder)
+        {
+            builder.HasData(new Level
+            {
+                Id = 1,
+                Name = "Bronze",
+                RequiredExp = 0,
+            }, new Level
+            {
+                Id = 2,
+                Name = "Silver",
+                RequiredExp = 100,
+            }, new Level { 
+                Id = 3,
+                Name = "Gold",
+                RequiredExp = 200,
+            }, new Level {
+                Id = 4,
+                Name = "Platinum",
+                RequiredExp = 300,
+            }, new Level { 
+                Id = 5,
+                Name = "Diamond",
+                RequiredExp = 400,
+            }, new Level {
+                Id = 6,
+                Name = "Crazy Rich",
+                RequiredExp = 500,
+            });
         }
     }
 }
