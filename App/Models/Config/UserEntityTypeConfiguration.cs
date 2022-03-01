@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Models.Config
@@ -46,10 +46,13 @@ namespace App.Models.Config
                 .HasColumnName("exp")
                 .HasDefaultValue(0);
 
-            builder.Property(b => b.Level)
+            builder.Property(b => b.LevelId)
                 .IsRequired()
-                .HasColumnName("level")
-                .HasDefaultValue(1); // New user starts from level 1
+                .HasColumnName("levelId");
+
+            builder.HasOne(u => u.Level)
+                .WithMany(l => l.Users)
+                .HasForeignKey(u => u.LevelId);
 
             builder.Property(b => b.Type)
                .IsRequired()

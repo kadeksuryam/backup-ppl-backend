@@ -1,4 +1,6 @@
-﻿namespace App.Models
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace App.Models
 {
     public class User : IEntity
     {
@@ -20,9 +22,11 @@
 
         public uint Exp { get; set; }
 
-        public uint Level { get; set; }
+        public uint LevelId { get; set; }
+
+        [ForeignKey("LevelId")]
+        public Level? Level { get; set; }
 
         public LoginType Type { get; set; }
-
     } 
 }

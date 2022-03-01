@@ -8,14 +8,21 @@ namespace App.Data
     {
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Level> Levels { get; set; }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
+        }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.EnableSensitiveDataLogging();
         }
 
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserEntityTypeConfiguration).Assembly);
+            new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
+            new LevelEntityTypeConfiguration().Configure(modelBuilder.Entity<Level>());
         }
         #endregion
     }
