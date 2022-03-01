@@ -1,9 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace App.Models
 {
     public class User : IEntity
     {
+        public enum LoginType {
+            Standard,
+            Google
+        }
         public uint Id { get; set; }
 
         public string UserName { get; set; } = string.Empty;
@@ -23,5 +27,6 @@ namespace App.Models
         [ForeignKey("LevelId")]
         public Level? Level { get; set; }
 
+        public LoginType Type { get; set; }
     } 
 }

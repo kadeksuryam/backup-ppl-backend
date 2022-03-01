@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Models.Config
@@ -8,8 +8,12 @@ namespace App.Models.Config
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.ToTable("users");
-            builder.HasKey(e => e.UserName);
+            builder.HasKey(e => e.Id);
+
+            // Uniqueness configuration
+            builder.HasIndex(e => e.Id).IsUnique();
             builder.HasIndex(e => e.UserName).IsUnique();
+            builder.HasIndex(e => e.Email).IsUnique();
 
             builder.Property(b => b.Id)
                 .IsRequired()
@@ -49,6 +53,12 @@ namespace App.Models.Config
             builder.HasOne(u => u.Level)
                 .WithMany(l => l.Users)
                 .HasForeignKey(u => u.LevelId);
+
+            builder.Property(b => b.Type)
+               .IsRequired()
+               .HasColumnName("login_type")
+               .HasDefaultValue(User.LoginType.Standard)
+               .HasConversion<string>();
         }
     }
 }

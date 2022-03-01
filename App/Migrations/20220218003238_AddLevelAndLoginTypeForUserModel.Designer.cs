@@ -2,6 +2,7 @@
 using App.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -10,9 +11,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220218003238_AddLevelAndLoginTypeForUserModel")]
+    partial class AddLevelAndLoginTypeForUserModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -23,12 +25,9 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.User", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    b.Property<string>("UserName")
+                        .HasColumnType("text")
+                        .HasColumnName("username");
 
                     b.Property<long>("Balance")
                         .ValueGeneratedOnAdd()
@@ -57,6 +56,13 @@ namespace App.Migrations
                         .HasDefaultValue(0L)
                         .HasColumnName("exp");
 
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
                     b.Property<long>("Level")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint")
@@ -70,18 +76,7 @@ namespace App.Migrations
                         .HasDefaultValue("Standard")
                         .HasColumnName("login_type");
 
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("username");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.HasIndex("Id")
-                        .IsUnique();
+                    b.HasKey("UserName");
 
                     b.HasIndex("UserName")
                         .IsUnique();
