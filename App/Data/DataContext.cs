@@ -21,8 +21,8 @@ namespace App.Data
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserEntityTypeConfiguration).Assembly);
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(LevelEntityTypeConfiguration).Assembly);
+            new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
+            new LevelEntityTypeConfiguration().Configure(modelBuilder.Entity<Level>());
         }
         #endregion
     }
