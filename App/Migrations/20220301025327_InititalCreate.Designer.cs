@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220226061228_InititalCreate")]
+    [Migration("20220301025327_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,7 +45,48 @@ namespace App.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Id")
+                        .IsUnique();
+
                     b.ToTable("levels", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "Bronze",
+                            RequiredExp = 0L
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "Silver",
+                            RequiredExp = 100L
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Name = "Gold",
+                            RequiredExp = 200L
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Name = "Platinum",
+                            RequiredExp = 300L
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Name = "Diamond",
+                            RequiredExp = 400L
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Name = "Crazy Rich",
+                            RequiredExp = 500L
+                        });
                 });
 
             modelBuilder.Entity("App.Models.User", b =>

@@ -48,6 +48,29 @@ namespace App.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.InsertData(
+                table: "levels",
+                columns: new[] { "id", "name" },
+                values: new object[] { 1L, "Bronze" });
+
+            migrationBuilder.InsertData(
+                table: "levels",
+                columns: new[] { "id", "name", "required_exp" },
+                values: new object[,]
+                {
+                    { 2L, "Silver", 100L },
+                    { 3L, "Gold", 200L },
+                    { 4L, "Platinum", 300L },
+                    { 5L, "Diamond", 400L },
+                    { 6L, "Crazy Rich", 500L }
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_levels_id",
+                table: "levels",
+                column: "id",
+                unique: true);
+
             migrationBuilder.CreateIndex(
                 name: "IX_users_levelId",
                 table: "users",
