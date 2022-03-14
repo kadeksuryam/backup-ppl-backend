@@ -21,6 +21,72 @@ namespace App.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("App.Models.Level", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<long>("RequiredExp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L)
+                        .HasColumnName("required_exp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("levels", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Name = "Bronze",
+                            RequiredExp = 0L
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Name = "Silver",
+                            RequiredExp = 100L
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Name = "Gold",
+                            RequiredExp = 200L
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Name = "Platinum",
+                            RequiredExp = 300L
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Name = "Diamond",
+                            RequiredExp = 400L
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Name = "Crazy Rich",
+                            RequiredExp = 500L
+                        });
+                });
+
             modelBuilder.Entity("App.Models.User", b =>
                 {
                     b.Property<long>("Id")
@@ -57,11 +123,9 @@ namespace App.Migrations
                         .HasDefaultValue(0L)
                         .HasColumnName("exp");
 
-                    b.Property<long>("Level")
-                        .ValueGeneratedOnAdd()
+                    b.Property<long>("LevelId")
                         .HasColumnType("bigint")
-                        .HasDefaultValue(1L)
-                        .HasColumnName("level");
+                        .HasColumnName("levelId");
 
                     b.Property<string>("Type")
                         .IsRequired()
@@ -83,10 +147,28 @@ namespace App.Migrations
                     b.HasIndex("Id")
                         .IsUnique();
 
+                    b.HasIndex("LevelId");
+
                     b.HasIndex("UserName")
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("App.Models.User", b =>
+                {
+                    b.HasOne("App.Models.Level", "Level")
+                        .WithMany("Users")
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Level");
+                });
+
+            modelBuilder.Entity("App.Models.Level", b =>
+                {
+                    b.Navigation("Users");
                 });
 #pragma warning restore 612, 618
         }

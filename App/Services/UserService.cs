@@ -31,21 +31,38 @@
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Conflict, "Username '" + dto.Username + "' is already taken");
             }
+
+            if (await IsEmailTaken(dto.Email))
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.Conflict, "Email '" + dto.Email + "' is already taken");
+            }
+
             var user = _mapper.Map<User>(dto);
 
             user.EncryptedPassword = _bcryptWrapper.hashPassword(dto.Password);
+
+            user.Balance = 0;
+            user.Exp = 0;
+            user.LevelId = 1;
+            user.Type = User.LoginType.Standard;
+
 
             await _userRepository.Add(user);
         }
 
         private async Task<bool> IsUsernameTaken(string username)
         {
-            return (await _userRepository.Get(username)) != null;
+            return (await _userRepository.GetByUsername(username)) != null;
+        }
+
+        private async Task<bool> IsEmailTaken(string email)
+        {
+            return (await _userRepository.GetByEmail(email)) != null;
         }
 
         public async Task<LoginResponseDTO> Login(LoginRequestDTO dto)
         {
-            User user = await _userRepository.GetByEmail(dto.Email);
+            User? user = await _userRepository.GetByEmail(dto.Email);
 
             if (user == null || !_bcryptWrapper.isPasswordCorrect(dto.Password, user.EncryptedPassword))
             {

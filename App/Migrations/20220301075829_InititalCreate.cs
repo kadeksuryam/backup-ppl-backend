@@ -27,19 +27,20 @@ namespace App.Migrations
                 name: "users",
                 columns: table => new
                 {
-                    username = table.Column<string>(type: "text", nullable: false),
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    username = table.Column<string>(type: "text", nullable: false),
                     encrypted_password = table.Column<string>(type: "text", nullable: false),
                     display_name = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "text", nullable: false),
                     balance = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
                     exp = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
-                    levelId = table.Column<long>(type: "bigint", nullable: false)
+                    levelId = table.Column<long>(type: "bigint", nullable: false),
+                    login_type = table.Column<string>(type: "text", nullable: false, defaultValue: "Standard")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_users", x => x.username);
+                    table.PrimaryKey("PK_users", x => x.id);
                     table.ForeignKey(
                         name: "FK_users_levels_levelId",
                         column: x => x.levelId,
@@ -68,6 +69,18 @@ namespace App.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_levels_id",
                 table: "levels",
+                column: "id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_email",
+                table: "users",
+                column: "email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_users_id",
+                table: "users",
                 column: "id",
                 unique: true);
 

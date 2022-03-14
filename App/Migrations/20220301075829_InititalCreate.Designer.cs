@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220301025327_InititalCreate")]
+    [Migration("20220301075829_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -91,9 +91,12 @@ namespace App.Migrations
 
             modelBuilder.Entity("App.Models.User", b =>
                 {
-                    b.Property<string>("UserName")
-                        .HasColumnType("text")
-                        .HasColumnName("username");
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
                     b.Property<long>("Balance")
                         .ValueGeneratedOnAdd()
@@ -122,18 +125,29 @@ namespace App.Migrations
                         .HasDefaultValue(0L)
                         .HasColumnName("exp");
 
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
                     b.Property<long>("LevelId")
                         .HasColumnType("bigint")
                         .HasColumnName("levelId");
 
-                    b.HasKey("UserName");
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Standard")
+                        .HasColumnName("login_type");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("username");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Id")
+                        .IsUnique();
 
                     b.HasIndex("LevelId");
 
