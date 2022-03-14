@@ -18,7 +18,7 @@ namespace Tests
     {
 
         [Fact]
-        public async void RegisterUser_EmailTaken_ReturnsException()
+        public async void RegisterUser_UsernameTaken_ReturnsException()
         {
             // Arrange
             var mockUserRepo = new Mock<IUserRepository>();
@@ -36,7 +36,7 @@ namespace Tests
 
             User user = new User();
             user.UserName = username;
-            mockUserRepo.Setup(p => p.Get(username)).ReturnsAsync((User)user);
+            mockUserRepo.Setup(p => p.GetByUsername(username)).ReturnsAsync((User)user);
 
             var userService = new UserService(mockUserRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
@@ -47,7 +47,7 @@ namespace Tests
             // Assert
             Assert.Equal(HttpStatusCode.Conflict, exception.StatusCode);
             Assert.Equal("Username '" + username + "' is already taken", exception.Message);
-            mockUserRepo.Verify(p => p.Get(username), Times.Once());
+            mockUserRepo.Verify(p => p.GetByUsername(username), Times.Once());
             mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Never());
         }
 
@@ -75,16 +75,16 @@ namespace Tests
             dto.Email = email;
             dto.Name = name;
 
-            mockUserRepo.Setup(p => p.Get(username)).ReturnsAsync((User)null);
+            mockUserRepo.Setup(p => p.GetByUsername(username)).ReturnsAsync((User)null);
 
             var userService = new UserService(mockUserRepo.Object, mapper,
                mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act
-            userService.Register(dto);
+            await userService.Register(dto);
 
             // Assert
-            mockUserRepo.Verify(p => p.Get(username), Times.Once());
+            mockUserRepo.Verify(p => p.GetByUsername(username), Times.Once());
             mockUserRepo.Verify(r => r.Add(It.IsAny<User>()), Times.Once());
         }
 

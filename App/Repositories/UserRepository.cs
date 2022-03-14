@@ -19,7 +19,7 @@ namespace App.Repositories
             return entity;
         }
 
-        public async Task<User> Delete(int id)
+        public async Task<User?> Delete(int id)
         {
             var entity = await _context.Users.FindAsync(id);
             if (entity == null)
@@ -50,13 +50,17 @@ namespace App.Repositories
             return entity;
         }
 
-        // We can add new methods specific to the user repository here in the future
-        public async Task<User> Get(string username)
+        public async Task<User?> Get(int id)
         {
-            return await _context.Users.FindAsync(username);
+            return await _context.Users.FindAsync(id);
         }
 
-        public async Task<User> GetByEmail(string email)
+        public async Task<User?> GetByUsername(string username)
+        {
+            return await _context.Users.Where(b => b.UserName == username).FirstOrDefaultAsync();
+        }
+
+        public async Task<User?> GetByEmail(string email)
         {
             return await _context.Users.Where(b => b.Email == email).FirstOrDefaultAsync();
         }
