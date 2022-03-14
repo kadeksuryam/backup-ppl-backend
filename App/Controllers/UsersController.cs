@@ -2,6 +2,7 @@
 using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Services;
+using App.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace App.Controllers
@@ -35,9 +36,26 @@ namespace App.Controllers
         }
 
         [HttpGet]
-        public IActionResult TestAuth()
+        public IActionResult ViewProfile()
         {
-            return Ok(new { message = "success" });
+            User? user = HttpContext.Items["User"] as User;
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            ViewProfileResponseDTO resDTO = new ViewProfileResponseDTO();
+            resDTO.Id = user.Id;
+            resDTO.Email = user.Email;
+            resDTO.UserName = user.UserName;
+            resDTO.DisplayName = user.DisplayName;
+            resDTO.EXP = user.Exp;
+            resDTO.Balance = user.Balance;
+            resDTO.LevelID = user.LevelId;
+
+
+            return Ok(resDTO);
         }
 
     }
