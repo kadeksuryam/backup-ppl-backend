@@ -40,7 +40,7 @@ namespace App.Controllers
             return Ok(new { message = "success" });
         }
 
-        [HttpPut("updateprofile")]
+        [HttpPut("{dto.UserId}")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequestDTO dto)
         {
             await _userService.UpdateProfile(dto);
