@@ -5,9 +5,7 @@ namespace App.Services
     public class UpdateProfileRequestDTO
     {
         [Required]
-        public uint UserId { get; set; }
-        [Required]
-        public string UserName { get; set; }
+        public int UserId { get; set; }
         [Required]
         [DisplayName]
         public string NewDisplayName { get; set; }

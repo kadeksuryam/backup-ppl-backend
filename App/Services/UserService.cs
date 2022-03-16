@@ -75,8 +75,8 @@
 
         public async Task UpdateProfile(UpdateProfileRequestDTO dto)
         {
-            User user = await _userRepository.Get(dto.UserName);
-            if (!_bcryptWrapper.isPasswordCorrect(dto.OldPassword, user.EncryptedPassword))
+            User user = await _userRepository.Get(dto.UserId); // guaranteed not null
+            if (!_bcryptWrapper.isPasswordCorrect(dto.OldPassword, user!.EncryptedPassword))
             {
                 throw GetUpdateProfileIncorrectOldPasswordException();
             }
@@ -104,8 +104,7 @@
 
         private bool HasGoogleLoginType(User user)
         {
-            // Implement it. For now, assume all user are standard type.
-            return false;
+            return user.Type == User.LoginType.Google;
         }
     }
 

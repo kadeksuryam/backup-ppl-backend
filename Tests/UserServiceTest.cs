@@ -200,10 +200,12 @@ namespace Tests
         private User? _userForUpdateProfileTest;
         private UserService? _userServiceForUpdateProfileTest;
         private bool _isOldPasswordMatchesWithItsEncrypt;
+        private bool _hasGoogleAccount;
 
-        private HttpStatusCodeException? _httpExceptionFromUpdateProfileTest;
+        private HttpStatusCodeException? _actualHttpExceptionFromUpdateProfileTest;
+        private HttpStatusCodeException? _expectedHttpExceptionFromUpdateProfileTest;
 
-        private const string UsernameForUpdateProfileTest = "testUsername";
+        private const int UserIdForUpdateProfileTest = 1234;
         private const string OldPasswordForUpdateProfileTest = "testOldPassword";
         private const string NewPasswordForUpdateProfileTest = "testNewPassword";
         private const string OldDisplayNameForUpdateProfileTest = "testOldDisplayName";
@@ -217,6 +219,7 @@ namespace Tests
         {
             // Arrange
             _isOldPasswordMatchesWithItsEncrypt = true;
+            _hasGoogleAccount = false;
             InitializeUpdateProfileTest();
 
             // Act
@@ -237,6 +240,7 @@ namespace Tests
         {
             // Arrange
             _isOldPasswordMatchesWithItsEncrypt = false;
+            _hasGoogleAccount = false;
             InitializeUpdateProfileTest();
 
             // Act & Assert
@@ -245,9 +249,25 @@ namespace Tests
             // Assert
             AssertHttpExceptionComesFromUpdateProfileIncorrectOldPasswordHandler();
         }
+
+        [Fact]
+        public async void UpdateProfileUser_GoogleAccount_ReturnsException()
+        {
+            // Arrange
+            _isOldPasswordMatchesWithItsEncrypt = true;
+            _hasGoogleAccount = true;
+            InitializeUpdateProfileTest();
+
+            // Act & Assert
+            await AssertUpdateProfileRequestThrowsHttpException();
+
+            // Assert
+            AssertHttpExceptionComesFromGoogleLoginTypeException();
+        }
+
         private async Task AssertUpdateProfileRequestThrowsHttpException()
         {
-            _httpExceptionFromUpdateProfileTest = await Assert.ThrowsAsync<HttpStatusCodeException>(
+            _actualHttpExceptionFromUpdateProfileTest = await Assert.ThrowsAsync<HttpStatusCodeException>(
                 () => UpdateProfileForUpdateProfileTest()
             );
         }
@@ -259,9 +279,20 @@ namespace Tests
 
         private void AssertHttpExceptionComesFromUpdateProfileIncorrectOldPasswordHandler()
         {
-            var expectedHttpException = _userServiceForUpdateProfileTest!.GetUpdateProfileIncorrectOldPasswordException();
-            Assert.Equal(expectedHttpException.StatusCode, _httpExceptionFromUpdateProfileTest!.StatusCode);
-            Assert.Equal(expectedHttpException.Message, _httpExceptionFromUpdateProfileTest!.Message);
+            _expectedHttpExceptionFromUpdateProfileTest = _userServiceForUpdateProfileTest!.GetUpdateProfileIncorrectOldPasswordException();
+            AssertSameHttpException();
+        }
+
+        private void AssertHttpExceptionComesFromGoogleLoginTypeException()
+        {
+            _expectedHttpExceptionFromUpdateProfileTest = _userServiceForUpdateProfileTest!.GetUpdateProfileGoogleLoginTypeException();
+            AssertSameHttpException();
+        }
+
+        private void AssertSameHttpException()
+        {
+            Assert.Equal(_expectedHttpExceptionFromUpdateProfileTest!.StatusCode,_actualHttpExceptionFromUpdateProfileTest!.StatusCode);
+            Assert.Equal(_expectedHttpExceptionFromUpdateProfileTest!.Message, _actualHttpExceptionFromUpdateProfileTest!.Message);
         }
 
         private void InitializeUpdateProfileTest()
@@ -288,9 +319,10 @@ namespace Tests
         {
             _userForUpdateProfileTest = new User
             {
-                UserName = UsernameForUpdateProfileTest,
+                Id = UserIdForUpdateProfileTest,
                 EncryptedPassword = OldEncryptedPasswordForUpdateProfileTest,
-                DisplayName = OldDisplayNameForUpdateProfileTest
+                DisplayName = OldDisplayNameForUpdateProfileTest,
+                Type = _hasGoogleAccount ? User.LoginType.Google : User.LoginType.Standard
             };
         }
 
@@ -298,7 +330,7 @@ namespace Tests
         {
             _updateProfileRequestDTO = new UpdateProfileRequestDTO
             {
-                UserName = UsernameForUpdateProfileTest,
+                UserId = UserIdForUpdateProfileTest,
                 OldPassword = OldPasswordForUpdateProfileTest,
                 NewPassword = NewPasswordForUpdateProfileTest,
                 NewDisplayName = NewDisplayNameForUpdateProfileTest
@@ -307,7 +339,7 @@ namespace Tests
 
         private void SetupMockForUpdateProfileTest()
         {
-            _mockUserRepoForUpdateProfileTest!.Setup(p => p.Get(UsernameForUpdateProfileTest)).ReturnsAsync(_userForUpdateProfileTest!);
+            _mockUserRepoForUpdateProfileTest!.Setup(p => p.Get(UserIdForUpdateProfileTest)).ReturnsAsync(_userForUpdateProfileTest!);
             _mockBcryptWrapper!.Setup(p => p.isPasswordCorrect(OldPasswordForUpdateProfileTest, OldEncryptedPasswordForUpdateProfileTest)).Returns(_isOldPasswordMatchesWithItsEncrypt);
             _mockBcryptWrapper!.Setup(p => p.hashPassword(NewPasswordForUpdateProfileTest)).Returns(NewEncryptedPasswordForUpdateProfileTest);
             _mockJwtUtil!.Setup(p => p.GenerateToken(_userForUpdateProfileTest!)).Returns(TokenForUpdateProfileTest);
