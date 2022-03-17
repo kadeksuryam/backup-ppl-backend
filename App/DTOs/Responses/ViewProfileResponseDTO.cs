@@ -16,8 +16,8 @@ namespace App.DTOs.Responses
         public uint Balance { get; set; }
         [JsonPropertyName("exp")]
         public uint EXP { get; set; }
-        [JsonPropertyName("levelId")]
-        public uint LevelID { get; set; }
+        [JsonPropertyName("level")]
+        public string Level { get; set; }
 
     }
 }

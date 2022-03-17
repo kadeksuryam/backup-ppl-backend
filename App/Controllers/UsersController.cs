@@ -2,6 +2,7 @@
 using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Services;
+using App.Repositories;
 using App.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,10 +14,12 @@ namespace App.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
+        private readonly ILevelRepository _levelRepository;
 
-        public UsersController(IUserService userService)
+        public UsersController(IUserService userService, ILevelRepository levelRepository)
         {
             _userService = userService;
+            _levelRepository = levelRepository;
         }
 
         [AllowAnonymous]
@@ -36,7 +39,7 @@ namespace App.Controllers
         }
 
         [HttpGet]
-        public IActionResult ViewProfile()
+        public async Task<IActionResult> ViewProfile()
         {
             User? user = HttpContext.Items["User"] as User;
 
@@ -52,7 +55,9 @@ namespace App.Controllers
             resDTO.DisplayName = user.DisplayName;
             resDTO.EXP = user.Exp;
             resDTO.Balance = user.Balance;
-            resDTO.LevelID = user.LevelId;
+
+            Level? level = await _levelRepository.GetById(user.LevelId);
+            resDTO.Level = level.Name;
 
 
             return Ok(resDTO);
