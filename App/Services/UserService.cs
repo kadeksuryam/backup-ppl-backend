@@ -73,9 +73,8 @@
             return response;
         }
 
-        public async Task UpdateProfile(UpdateProfileRequestDTO dto)
+        public async Task UpdateProfile(User user, UpdateProfileRequestDTO dto)
         {
-            User user = await _userRepository.Get(dto.UserId); // guaranteed not null
             if (!_bcryptWrapper.isPasswordCorrect(dto.OldPassword, user!.EncryptedPassword))
             {
                 throw GetUpdateProfileIncorrectOldPasswordException();

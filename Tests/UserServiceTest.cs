@@ -274,7 +274,7 @@ namespace Tests
 
         private async Task UpdateProfileForUpdateProfileTest()
         {
-            await _userServiceForUpdateProfileTest!.UpdateProfile(_updateProfileRequestDTO!);
+            await _userServiceForUpdateProfileTest!.UpdateProfile(_userForUpdateProfileTest, _updateProfileRequestDTO!);
         }
 
         private void AssertHttpExceptionComesFromUpdateProfileIncorrectOldPasswordHandler()
@@ -330,7 +330,6 @@ namespace Tests
         {
             _updateProfileRequestDTO = new UpdateProfileRequestDTO
             {
-                UserId = UserIdForUpdateProfileTest,
                 OldPassword = OldPasswordForUpdateProfileTest,
                 NewPassword = NewPasswordForUpdateProfileTest,
                 NewDisplayName = NewDisplayNameForUpdateProfileTest

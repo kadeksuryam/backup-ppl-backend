@@ -63,10 +63,12 @@ namespace App.Controllers
             return Ok(resDTO);
         }
 
-        [HttpPut("{dto.UserId}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequestDTO dto)
         {
-            await _userService.UpdateProfile(dto);
+            User? user = HttpContext.Items["User"] as User;
+
+            await _userService.UpdateProfile(user, dto);
             return Ok(new { message = "Update profile successful" });
         }
 
