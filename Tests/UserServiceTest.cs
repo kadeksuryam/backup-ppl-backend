@@ -7,7 +7,9 @@ using App.Repositories;
 using App.Services;
 using AutoMapper;
 using Moq;
+using System;
 using System.Net;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Tests
@@ -186,6 +188,166 @@ namespace Tests
             mockUserRepo.Verify(p => p.GetByEmail(dto.Email), Times.Once());
             mockBcryptWrapper.Verify(p => p.isPasswordCorrect(dto.Password, user.EncryptedPassword), Times.Once());
             mockJwtUtil.Verify(p => p.GenerateToken(user), Times.Once());
+        }
+
+        /* For update profile */
+        private Mock<IUserRepository>? _mockUserRepoForUpdateProfileTest;
+        private Mapper? _mapperForUpdateProfileTest;
+        private Mock<IJwtUtils>? _mockJwtUtil;
+        private Mock<IBcryptWrapper>? _mockBcryptWrapper;
+
+        private UpdateProfileRequestDTO? _updateProfileRequestDTO;
+        private User? _userForUpdateProfileTest;
+        private UserService? _userServiceForUpdateProfileTest;
+        private bool _isOldPasswordMatchesWithItsEncrypt;
+        private bool _hasGoogleAccount;
+
+        private HttpStatusCodeException? _actualHttpExceptionFromUpdateProfileTest;
+        private HttpStatusCodeException? _expectedHttpExceptionFromUpdateProfileTest;
+
+        private const int UserIdForUpdateProfileTest = 1234;
+        private const string OldPasswordForUpdateProfileTest = "testOldPassword";
+        private const string NewPasswordForUpdateProfileTest = "testNewPassword";
+        private const string OldDisplayNameForUpdateProfileTest = "testOldDisplayName";
+        private const string NewDisplayNameForUpdateProfileTest = "testNewDisplayName";
+        private const string OldEncryptedPasswordForUpdateProfileTest = "testOldEncryptedPassword";
+        private const string NewEncryptedPasswordForUpdateProfileTest = "testNewEncryptedPassword";
+        private const string TokenForUpdateProfileTest = "testToken";
+
+        [Fact]
+        public async void UpdateProfileUser_ValidData_ReturnsSuccess()
+        {
+            // Arrange
+            _isOldPasswordMatchesWithItsEncrypt = true;
+            _hasGoogleAccount = false;
+            InitializeUpdateProfileTest();
+
+            // Act
+            await UpdateProfileForUpdateProfileTest();
+
+            // Assert
+            AssertUpdateProfileRequestFulfilled();
+        }
+
+        private void AssertUpdateProfileRequestFulfilled()
+        {
+            Assert.Equal(_updateProfileRequestDTO!.NewDisplayName, _userForUpdateProfileTest!.DisplayName);
+            Assert.Equal(NewEncryptedPasswordForUpdateProfileTest, _userForUpdateProfileTest.EncryptedPassword);
+        }
+
+        [Fact]
+        public async void UpdateProfileUser_InvalidCorrectPassword_ReturnsException()
+        {
+            // Arrange
+            _isOldPasswordMatchesWithItsEncrypt = false;
+            _hasGoogleAccount = false;
+            InitializeUpdateProfileTest();
+
+            // Act & Assert
+            await AssertUpdateProfileRequestThrowsHttpException();
+
+            // Assert
+            AssertHttpExceptionComesFromUpdateProfileIncorrectOldPasswordHandler();
+        }
+
+        [Fact]
+        public async void UpdateProfileUser_GoogleAccount_ReturnsException()
+        {
+            // Arrange
+            _isOldPasswordMatchesWithItsEncrypt = true;
+            _hasGoogleAccount = true;
+            InitializeUpdateProfileTest();
+
+            // Act & Assert
+            await AssertUpdateProfileRequestThrowsHttpException();
+
+            // Assert
+            AssertHttpExceptionComesFromGoogleLoginTypeException();
+        }
+
+        private async Task AssertUpdateProfileRequestThrowsHttpException()
+        {
+            _actualHttpExceptionFromUpdateProfileTest = await Assert.ThrowsAsync<HttpStatusCodeException>(
+                () => UpdateProfileForUpdateProfileTest()
+            );
+        }
+
+        private async Task UpdateProfileForUpdateProfileTest()
+        {
+            await _userServiceForUpdateProfileTest!.UpdateProfile(_userForUpdateProfileTest, _updateProfileRequestDTO!);
+        }
+
+        private void AssertHttpExceptionComesFromUpdateProfileIncorrectOldPasswordHandler()
+        {
+            _expectedHttpExceptionFromUpdateProfileTest = _userServiceForUpdateProfileTest!.GetUpdateProfileIncorrectOldPasswordException();
+            AssertSameHttpException();
+        }
+
+        private void AssertHttpExceptionComesFromGoogleLoginTypeException()
+        {
+            _expectedHttpExceptionFromUpdateProfileTest = _userServiceForUpdateProfileTest!.GetUpdateProfileGoogleLoginTypeException();
+            AssertSameHttpException();
+        }
+
+        private void AssertSameHttpException()
+        {
+            Assert.Equal(_expectedHttpExceptionFromUpdateProfileTest!.StatusCode,_actualHttpExceptionFromUpdateProfileTest!.StatusCode);
+            Assert.Equal(_expectedHttpExceptionFromUpdateProfileTest!.Message, _actualHttpExceptionFromUpdateProfileTest!.Message);
+        }
+
+        private void InitializeUpdateProfileTest()
+        {
+            InitializeMockAndMapperForUpdateProfileTest();
+            InitializeUserForUpdateProfileTest();
+            InitializeRequestDTOForUpdateProfileTest();
+            SetupMockForUpdateProfileTest();
+            InitializeUserServiceForUpdateProfileTest();
+        }
+
+        private void InitializeMockAndMapperForUpdateProfileTest() {
+            _mockUserRepoForUpdateProfileTest = new Mock<IUserRepository>();
+            _mapperForUpdateProfileTest = new Mapper(
+                new MapperConfiguration(cfg => {
+                    cfg.AddProfile(new AutoMapperProfile());
+                })
+            );
+            _mockJwtUtil = new Mock<IJwtUtils>();
+            _mockBcryptWrapper = new Mock<IBcryptWrapper>();
+        }
+
+        private void InitializeUserForUpdateProfileTest()
+        {
+            _userForUpdateProfileTest = new User
+            {
+                Id = UserIdForUpdateProfileTest,
+                EncryptedPassword = OldEncryptedPasswordForUpdateProfileTest,
+                DisplayName = OldDisplayNameForUpdateProfileTest,
+                Type = _hasGoogleAccount ? User.LoginType.Google : User.LoginType.Standard
+            };
+        }
+
+        private void InitializeRequestDTOForUpdateProfileTest()
+        {
+            _updateProfileRequestDTO = new UpdateProfileRequestDTO
+            {
+                OldPassword = OldPasswordForUpdateProfileTest,
+                NewPassword = NewPasswordForUpdateProfileTest,
+                NewDisplayName = NewDisplayNameForUpdateProfileTest
+            };
+        }
+
+        private void SetupMockForUpdateProfileTest()
+        {
+            _mockUserRepoForUpdateProfileTest!.Setup(p => p.Get(UserIdForUpdateProfileTest)).ReturnsAsync(_userForUpdateProfileTest!);
+            _mockBcryptWrapper!.Setup(p => p.isPasswordCorrect(OldPasswordForUpdateProfileTest, OldEncryptedPasswordForUpdateProfileTest)).Returns(_isOldPasswordMatchesWithItsEncrypt);
+            _mockBcryptWrapper!.Setup(p => p.hashPassword(NewPasswordForUpdateProfileTest)).Returns(NewEncryptedPasswordForUpdateProfileTest);
+            _mockJwtUtil!.Setup(p => p.GenerateToken(_userForUpdateProfileTest!)).Returns(TokenForUpdateProfileTest);
+        }
+
+        private void InitializeUserServiceForUpdateProfileTest()
+        {
+            _userServiceForUpdateProfileTest = new UserService(_mockUserRepoForUpdateProfileTest!.Object, _mapperForUpdateProfileTest!,
+                _mockJwtUtil!.Object, _mockBcryptWrapper!.Object);
         }
     }
 }
