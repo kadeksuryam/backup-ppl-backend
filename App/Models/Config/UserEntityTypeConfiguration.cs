@@ -59,6 +59,14 @@ namespace App.Models.Config
                .HasColumnName("login_type")
                .HasDefaultValue(User.LoginType.Standard)
                .HasConversion<string>();
+
+            builder.HasMany(u => u.TopUpHistories)
+                .WithOne(h => h.From)
+                .HasForeignKey(h => h.FromUserId);
+
+            builder.HasMany(u => u.BankTopUpRequests)
+                .WithOne(r => r.From)
+                .HasForeignKey(r => r.FromUserId);
         }
     }
 }

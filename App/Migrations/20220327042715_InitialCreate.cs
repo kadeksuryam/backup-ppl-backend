@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace App.Migrations
 {
-    public partial class InititalCreate : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -49,6 +50,60 @@ namespace App.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "BankTopUpRequest",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    VirtualAccountNumber = table.Column<int>(type: "integer", nullable: false),
+                    DueDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Value = table.Column<int>(type: "integer", nullable: false),
+                    BankName = table.Column<string>(type: "text", nullable: true),
+                    FromUserId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BankTopUpRequest", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BankTopUpRequest_users_FromUserId",
+                        column: x => x.FromUserId,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TopUpHistory",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Value = table.Column<int>(type: "integer", nullable: false),
+                    CurrentStatus = table.Column<int>(type: "integer", nullable: true),
+                    Method = table.Column<int>(type: "integer", nullable: true),
+                    FromUserId = table.Column<long>(type: "bigint", nullable: false),
+                    BankRequestId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TopUpHistory", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TopUpHistory_BankTopUpRequest_BankRequestId",
+                        column: x => x.BankRequestId,
+                        principalTable: "BankTopUpRequest",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_TopUpHistory_users_FromUserId",
+                        column: x => x.FromUserId,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "levels",
                 columns: new[] { "id", "name" },
@@ -67,10 +122,26 @@ namespace App.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_BankTopUpRequest_FromUserId",
+                table: "BankTopUpRequest",
+                column: "FromUserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_levels_id",
                 table: "levels",
                 column: "id",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TopUpHistory_BankRequestId",
+                table: "TopUpHistory",
+                column: "BankRequestId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TopUpHistory_FromUserId",
+                table: "TopUpHistory",
+                column: "FromUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_users_email",
@@ -98,6 +169,12 @@ namespace App.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "TopUpHistory");
+
+            migrationBuilder.DropTable(
+                name: "BankTopUpRequest");
+
             migrationBuilder.DropTable(
                 name: "users");
 

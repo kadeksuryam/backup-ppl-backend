@@ -28,5 +28,9 @@ namespace App.Models
         public Level? Level { get; set; }
 
         public LoginType Type { get; set; }
+
+        public List<TopUpHistory>? TopUpHistories { get; set; }
+        public List<BankTopUpRequest>? BankTopUpRequests { get; set; }
+
     } 
 }
