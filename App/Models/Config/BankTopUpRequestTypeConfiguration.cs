@@ -1,60 +1,79 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using App.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Models.Config
 {
     public class BankTopUpRequestTypeConfiguration : IEntityTypeConfiguration<BankTopUpRequest>
     {
-        private EntityTypeBuilder<BankTopUpRequest>? builder;
-
         public void Configure(EntityTypeBuilder<BankTopUpRequest> builder)
         {
-            this.builder = builder;
-            SetConfiguration();
+            ConfigureTable(builder);
+            ConfigureAttributes(builder);
+            ConfigureRelations(builder);
         }
 
-        private void SetConfiguration()
+        private static void ConfigureTable(EntityTypeBuilder<BankTopUpRequest> builder)
         {
-            builder!.ToTable("bank_topup_request");
-            builder!.HasKey(e => e.Id);
-            builder!.HasIndex(e => e.Id).IsUnique();
-            SetGeneralProperties();
-
-            builder!.HasOne(r => r.History)
-                .WithOne(h => h.BankRequest)
-                .HasForeignKey<BankTopUpRequest>(r => r.Id);
-
-            builder!.HasOne(r => r.From)
-                .WithMany(u => u.BankTopUpRequests)
-                .HasForeignKey(r => r.FromUserId);
+            builder.ToTable("bank_topup_request");
+            builder.HasKey(b => b.Id);
+            builder.HasIndex(b => b.Id).IsUnique();
         }
 
-        private void SetGeneralProperties()
+        private static void ConfigureAttributes(EntityTypeBuilder<BankTopUpRequest> builder)
         {
-            builder!.Property(b => b.Id)
+            builder.Property(r => r.Id)
                 .IsRequired()
-                .HasColumnName("bank_request_id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
 
-            builder!.Property(b => b.VirtualAccountNumber)
+            builder.Property(r => r.CreatedAt)
                 .IsRequired()
-                .HasColumnName("virtual_account_number");
-
-            builder!.Property(b => b.DueDate)
-                .IsRequired()
-                .HasColumnName("due_date")
+                .HasColumnName("created_at")
                 .HasConversion<string>();
 
-            builder!.Property(b => b.Value)
+            builder.Property(r => r.UpdatedAt)
                 .IsRequired()
-                .HasColumnName("value");
+                .HasColumnName("updated_at")
+                .HasConversion<string>();
 
-            builder!.Property(b => b.BankName)
+            builder.Property(r => r.ExpiredDate)
                 .IsRequired()
-                .HasColumnName("bank_name");
+                .HasColumnName("expired_date")
+                .HasConversion<string>();
 
-            builder!.Property(b => b.FromUserId)
+            builder.Property(r => r.Amount)
+                .IsRequired()
+                .HasColumnName("amount");
+
+            builder.Property(r => r.BankId)
+                .IsRequired()
+                .HasColumnName("bank_id");
+
+            builder.Property(r => r.FromUserId)
                 .IsRequired()
                 .HasColumnName("from_user_id");
+
+            builder.Property(r => r.Status)
+                .IsRequired()
+                .HasColumnName("status")
+                .HasDefaultValue(RequestStatus.Pending)
+                .HasConversion<string>();
+        }
+
+        private static void ConfigureRelations(EntityTypeBuilder<BankTopUpRequest> builder)
+        {
+            builder.HasOne(r => r.History)
+                .WithOne(h => h.BankRequest)
+                .HasForeignKey<TopUpHistory>(h => h.BankRequestId);
+
+            builder.HasOne(r => r.From)
+                .WithMany(u => u.BankTopUpRequests)
+                .HasForeignKey(r => r.FromUserId);
+
+            builder.HasOne(r => r.Bank)
+                .WithMany(b => b.BankTopUpRequests)
+                .HasForeignKey(r => r.BankId);
         }
     }
 }

@@ -15,11 +15,11 @@ namespace App.Models
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public User? From { get; set; }
-        public int Value { get; set; }
-        public Status? CurrentStatus { get; set; }
+        public int Amount { get; set; }
         public TopUpMethod? Method { get; set; }
 
         // Only for bank
+        [ForeignKey("BankRequestId")]
         public BankTopUpRequest? BankRequest { get; set; }
 
         // Only for voucher
@@ -27,7 +27,7 @@ namespace App.Models
 
         // For foreign key
         public uint FromUserId { get; set; }
-        public uint BankRequestId { get; set; }
+        public uint? BankRequestId { get; set; }
         // public uint UsedVoucherId { get; set; }
     }
 }

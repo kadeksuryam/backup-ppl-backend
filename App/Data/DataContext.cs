@@ -10,6 +10,13 @@ namespace App.Data
 
         public DbSet<Level> Levels { get; set; }
 
+        public DbSet<TopUpHistory> TopUpHistories { get; set; }
+
+        public DbSet<BankTopUpRequest> BankTopUpRequests { get; set; }
+
+        public DbSet<Bank> Banks { get; set; }
+
+
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }
@@ -23,6 +30,9 @@ namespace App.Data
         {
             new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
             new LevelEntityTypeConfiguration().Configure(modelBuilder.Entity<Level>());
+            new TopUpHistoryTypeConfiguration().Configure(modelBuilder.Entity<TopUpHistory>());
+            new BankTopUpRequestTypeConfiguration().Configure(modelBuilder.Entity<BankTopUpRequest>());
+            new BankTypeConfiguration().Configure(modelBuilder.Entity<Bank>());
         }
         #endregion
     }

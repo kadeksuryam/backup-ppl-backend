@@ -1,6 +1,6 @@
-﻿namespace App.Models
+﻿namespace App.Models.Enums
 {
-    public enum Status
+    public enum RequestStatus
     {
         Pending,
         Success,
