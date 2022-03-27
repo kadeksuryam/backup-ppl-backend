@@ -23,6 +23,7 @@ namespace App.Data
         {
             new UserEntityTypeConfiguration().Configure(modelBuilder.Entity<User>());
             new LevelEntityTypeConfiguration().Configure(modelBuilder.Entity<Level>());
+            new VoucherEntityTypeConfiguration().Configure(modelBuilder.Entity<Voucher>());
         }
         #endregion
     }

@@ -24,6 +24,22 @@ namespace App.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "vouchers",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    code = table.Column<string>(type: "text", nullable: false),
+                    amount = table.Column<long>(type: "bigint", nullable: false),
+                    created_at = table.Column<string>(type: "character varying(48)", nullable: false),
+                    updated_at = table.Column<string>(type: "character varying(48)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_vouchers", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
                 {
@@ -94,12 +110,21 @@ namespace App.Migrations
                 table: "users",
                 column: "username",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_vouchers_code",
+                table: "vouchers",
+                column: "code",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "users");
+
+            migrationBuilder.DropTable(
+                name: "vouchers");
 
             migrationBuilder.DropTable(
                 name: "levels");
