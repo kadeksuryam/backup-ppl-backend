@@ -1,4 +1,5 @@
-﻿using App.DTOs.Requests;
+﻿using App.Models;
+using App.DTOs.Requests;
 using App.DTOs.Responses;
 
 namespace App.Services
@@ -7,5 +8,6 @@ namespace App.Services
     {
         Task Register(RegisterRequestDTO dto);
         Task<LoginResponseDTO> Login(LoginRequestDTO dto);
+        Task UpdateProfile(User user, UpdateProfileRequestDTO dto);
     }
 }

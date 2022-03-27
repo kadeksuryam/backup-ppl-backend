@@ -8,7 +8,6 @@
     using App.Repositories;
     using AutoMapper;
     using System.Net;
-    using BCrypt = BCrypt.Net.BCrypt;
 
     public class UserService : IUserService
     {
@@ -16,7 +15,7 @@
         private readonly IMapper _mapper;
         private readonly IJwtUtils _jwtUtils;
         private readonly IBcryptWrapper _bcryptWrapper;
-        public UserService(IUserRepository repository, IMapper mapper, 
+        public UserService(IUserRepository repository, IMapper mapper,
             IJwtUtils jwtUtils, IBcryptWrapper bcryptWrapper)
         {
             _userRepository = repository;
@@ -68,10 +67,43 @@
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Unauthorized, "Incorrect email or password");
             }
-            
+
             var response = _mapper.Map<LoginResponseDTO>(user);
             response.Token = _jwtUtils.GenerateToken(user);
             return response;
+        }
+
+        public async Task UpdateProfile(User user, UpdateProfileRequestDTO dto)
+        {
+            if (!_bcryptWrapper.isPasswordCorrect(dto.OldPassword, user!.EncryptedPassword))
+            {
+                throw GetUpdateProfileIncorrectOldPasswordException();
+            }
+            else if (HasGoogleLoginType(user))
+            {
+                throw GetUpdateProfileGoogleLoginTypeException();
+            }
+            else
+            {
+                user.DisplayName = dto.NewDisplayName;
+                user.EncryptedPassword = _bcryptWrapper.hashPassword(dto.NewPassword);
+                await _userRepository.Update(user);
+            }
+        }
+
+        public HttpStatusCodeException GetUpdateProfileIncorrectOldPasswordException()
+        {
+            return new HttpStatusCodeException(HttpStatusCode.Unauthorized, "Incorrect old password");
+        }
+
+        public HttpStatusCodeException GetUpdateProfileGoogleLoginTypeException()
+        {
+            return new HttpStatusCodeException(HttpStatusCode.Forbidden, "Cannot update with Google account");
+        }
+
+        private bool HasGoogleLoginType(User user)
+        {
+            return user.Type == User.LoginType.Google;
         }
     }
 
