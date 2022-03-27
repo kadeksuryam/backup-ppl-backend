@@ -7,5 +7,6 @@
         public uint Amount { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+        public bool IsUsed { get; set; }
     }
 }

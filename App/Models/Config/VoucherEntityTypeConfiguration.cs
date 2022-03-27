@@ -33,6 +33,11 @@ namespace App.Models.Config
                 .IsRequired()
                 .HasColumnName("updated_at")
                 .HasConversion<string>();
+
+            builder.Property(b => b.IsUsed)
+                .IsRequired()
+                .HasColumnName("is_used")
+                .HasDefaultValue(false);
         }
     }
 }

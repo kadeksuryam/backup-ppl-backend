@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220327104422_InititalCreate")]
+    [Migration("20220327123001_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -179,6 +179,12 @@ namespace App.Migrations
                         .IsRequired()
                         .HasColumnType("character varying(48)")
                         .HasColumnName("created_at");
+
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_used");
 
                     b.Property<string>("UpdatedAt")
                         .IsRequired()

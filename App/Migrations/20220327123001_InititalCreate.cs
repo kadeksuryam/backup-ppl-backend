@@ -32,7 +32,8 @@ namespace App.Migrations
                     code = table.Column<string>(type: "text", nullable: false),
                     amount = table.Column<long>(type: "bigint", nullable: false),
                     created_at = table.Column<string>(type: "character varying(48)", nullable: false),
-                    updated_at = table.Column<string>(type: "character varying(48)", nullable: false)
+                    updated_at = table.Column<string>(type: "character varying(48)", nullable: false),
+                    is_used = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {

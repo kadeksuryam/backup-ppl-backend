@@ -178,6 +178,12 @@ namespace App.Migrations
                         .HasColumnType("character varying(48)")
                         .HasColumnName("created_at");
 
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_used");
+
                     b.Property<string>("UpdatedAt")
                         .IsRequired()
                         .HasColumnType("character varying(48)")
