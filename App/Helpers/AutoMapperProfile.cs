@@ -15,6 +15,10 @@ namespace App.Helpers
                     opt => opt.MapFrom(src => src.Name));
 
             CreateMap<User, LoginResponseDTO>();
+
+            CreateMap<User, GetProfileResponseDTO>()
+                .ForMember(dest =>
+                    dest.Level, opt => opt.Ignore());
         }
 
     }

@@ -3,8 +3,9 @@ using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Services;
 using App.Repositories;
-using App.Models;
 using Microsoft.AspNetCore.Mvc;
+using App.Helpers;
+using System.Net;
 
 namespace App.Controllers
 {
@@ -14,12 +15,10 @@ namespace App.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ILevelRepository _levelRepository;
 
         public UsersController(IUserService userService, ILevelRepository levelRepository)
         {
             _userService = userService;
-            _levelRepository = levelRepository;
         }
 
         [AllowAnonymous]
@@ -38,37 +37,33 @@ namespace App.Controllers
             return Ok(resDTO);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ViewProfile()
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetProfile(uint userId)
         {
-            User? user = HttpContext.Items["User"] as User;
+            uint? currUserId = (uint)HttpContext.Items["userId"];
 
-            if (user == null)
+            if(currUserId != userId)
             {
-                return NotFound();
+                throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
             }
 
-            ViewProfileResponseDTO resDTO = new ViewProfileResponseDTO();
-            resDTO.Id = user.Id;
-            resDTO.Email = user.Email;
-            resDTO.UserName = user.UserName;
-            resDTO.DisplayName = user.DisplayName;
-            resDTO.EXP = user.Exp;
-            resDTO.Balance = user.Balance;
+            var response = await _userService.GetProfile(userId);
 
-            Level? level = await _levelRepository.GetById(user.LevelId);
-            resDTO.Level = level.Name;
+            return Ok(response);
 
-
-            return Ok(resDTO);
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequestDTO dto)
+        [HttpPatch("{userId}")]
+        public async Task<IActionResult> UpdateProfile(uint userId, [FromBody] UpdateProfileRequestDTO dto)
         {
-            User? user = HttpContext.Items["User"] as User;
+            uint? currUserId = (uint)HttpContext.Items["userId"];
 
-            await _userService.UpdateProfile(user, dto);
+            if (currUserId != userId)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
+            }
+
+            await _userService.UpdateProfile(userId, dto);
             return Ok(new { message = "Update profile successful" });
         }
 
