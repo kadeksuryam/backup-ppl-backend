@@ -82,9 +82,6 @@ namespace App.Migrations
                         .HasDefaultValue("Pending")
                         .HasColumnName("status");
 
-                    b.Property<long?>("ToBankId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("UpdatedAt")
                         .IsRequired()
                         .HasColumnType("character varying(48)")

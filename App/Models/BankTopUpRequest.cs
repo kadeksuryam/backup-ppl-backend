@@ -11,7 +11,7 @@ namespace App.Models
         public DateTime ExpiredDate { get; set; }
         public int Amount { get; set; }
 
-        [ForeignKey("ToBankId")]
+        [ForeignKey("BankId")]
         public Bank? Bank { get; set; }
 
         [ForeignKey("FromUserId")]

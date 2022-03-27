@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220327144912_InititalCreate")]
+    [Migration("20220327164138_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -83,9 +83,6 @@ namespace App.Migrations
                         .HasColumnType("text")
                         .HasDefaultValue("Pending")
                         .HasColumnName("status");
-
-                    b.Property<long?>("ToBankId")
-                        .HasColumnType("bigint");
 
                     b.Property<string>("UpdatedAt")
                         .IsRequired()

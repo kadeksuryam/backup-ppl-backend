@@ -75,8 +75,7 @@ namespace App.Migrations
                     amount = table.Column<int>(type: "integer", nullable: false),
                     status = table.Column<string>(type: "text", nullable: false, defaultValue: "Pending"),
                     from_user_id = table.Column<long>(type: "bigint", nullable: false),
-                    bank_id = table.Column<long>(type: "bigint", nullable: false),
-                    ToBankId = table.Column<long>(type: "bigint", nullable: true)
+                    bank_id = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
