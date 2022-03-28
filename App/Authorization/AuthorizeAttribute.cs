@@ -16,8 +16,8 @@ namespace App.Authorization
             if (allowAnonymous) return;
 
             // authorization
-            var user = (User)ctx.HttpContext.Items["User"];
-            if(user == null)
+            var userId = ctx.HttpContext.Items["userId"];
+            if(userId == null)
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Unauthorized, "Unauthorized");
             }

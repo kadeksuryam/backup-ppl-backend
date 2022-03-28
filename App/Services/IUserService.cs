@@ -8,6 +8,8 @@ namespace App.Services
     {
         Task Register(RegisterRequestDTO dto);
         Task<LoginResponseDTO> Login(LoginRequestDTO dto);
-        Task UpdateProfile(User user, UpdateProfileRequestDTO dto);
+        Task UpdateProfile(uint userId, UpdateProfileRequestDTO dto);
+
+        Task<GetProfileResponseDTO> GetProfile(uint userId);
     }
 }

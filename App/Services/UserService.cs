@@ -12,13 +12,16 @@
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly ILevelRepository _levelRepository;
         private readonly IMapper _mapper;
         private readonly IJwtUtils _jwtUtils;
         private readonly IBcryptWrapper _bcryptWrapper;
-        public UserService(IUserRepository repository, IMapper mapper,
+        public UserService(IUserRepository userRepository, ILevelRepository levelRepository,
+            IMapper mapper,
             IJwtUtils jwtUtils, IBcryptWrapper bcryptWrapper)
         {
-            _userRepository = repository;
+            _userRepository = userRepository;
+            _levelRepository = levelRepository;
             _mapper = mapper;
             _jwtUtils = jwtUtils;
             _bcryptWrapper = bcryptWrapper;
@@ -73,22 +76,34 @@
             return response;
         }
 
-        public async Task UpdateProfile(User user, UpdateProfileRequestDTO dto)
+        public async Task UpdateProfile(uint userId, UpdateProfileRequestDTO dto)
         {
-            if (!_bcryptWrapper.isPasswordCorrect(dto.OldPassword, user!.EncryptedPassword))
+            User userDb = await _userRepository.GetById(userId);
+
+            if (!_bcryptWrapper.isPasswordCorrect(dto.OldPassword, userDb!.EncryptedPassword))
             {
                 throw GetUpdateProfileIncorrectOldPasswordException();
             }
-            else if (HasGoogleLoginType(user))
+            else if (HasGoogleLoginType(userDb))
             {
                 throw GetUpdateProfileGoogleLoginTypeException();
             }
             else
             {
-                user.DisplayName = dto.NewDisplayName;
-                user.EncryptedPassword = _bcryptWrapper.hashPassword(dto.NewPassword);
-                await _userRepository.Update(user);
+                userDb.DisplayName = dto.NewDisplayName;
+                userDb.EncryptedPassword = _bcryptWrapper.hashPassword(dto.NewPassword);
+                await _userRepository.Update(userDb);
             }
+        }
+
+        public async Task<GetProfileResponseDTO> GetProfile(uint userId)
+        {
+            User userDb = await _userRepository.GetById(userId);
+
+            var response = _mapper.Map<GetProfileResponseDTO>(userDb);
+            response.Level = (await _levelRepository.GetById(userDb.LevelId)).Name;
+
+            return response;
         }
 
         public HttpStatusCodeException GetUpdateProfileIncorrectOldPasswordException()

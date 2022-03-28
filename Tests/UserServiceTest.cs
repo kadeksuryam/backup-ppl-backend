@@ -22,6 +22,8 @@ namespace Tests
         {
             // Arrange
             var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
+
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new AutoMapperProfile());
@@ -38,7 +40,7 @@ namespace Tests
             user.UserName = username;
             mockUserRepo.Setup(p => p.GetByUsername(username)).ReturnsAsync((User)user);
 
-            var userService = new UserService(mockUserRepo.Object, mapper,
+            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act & Assert
@@ -56,6 +58,7 @@ namespace Tests
         {
             // Arrange
             var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new AutoMapperProfile());
@@ -77,7 +80,7 @@ namespace Tests
 
             mockUserRepo.Setup(p => p.GetByUsername(username)).ReturnsAsync((User)null);
 
-            var userService = new UserService(mockUserRepo.Object, mapper,
+            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
                mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act
@@ -93,6 +96,7 @@ namespace Tests
         {
             // Arrange
             var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new AutoMapperProfile());
@@ -106,7 +110,7 @@ namespace Tests
             dto.Password = "test";
 
             mockUserRepo.Setup(p => p.GetByEmail(dto.Email)).ReturnsAsync((User)null);
-            var userService = new UserService(mockUserRepo.Object, mapper,
+            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
                  mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act & Assert
@@ -123,6 +127,7 @@ namespace Tests
         {
             // Arrange
             var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new AutoMapperProfile());
@@ -140,7 +145,7 @@ namespace Tests
             mockUserRepo.Setup(p => p.GetByEmail(dto.Email)).ReturnsAsync((User)user);
             mockBcryptWrapper.Setup(p => p.isPasswordCorrect(dto.Password, user.EncryptedPassword)).Returns(false);
 
-            var userService = new UserService(mockUserRepo.Object, mapper,
+            var userService = new UserService(mockUserRepo.Object,  mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act & Assert
@@ -158,6 +163,7 @@ namespace Tests
         {
             // Arrange
             var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new AutoMapperProfile());
@@ -177,7 +183,7 @@ namespace Tests
             mockBcryptWrapper.Setup(p => p.isPasswordCorrect(dto.Password, user.EncryptedPassword)).Returns(true);
             mockJwtUtil.Setup(p => p.GenerateToken(user)).Returns(token);
 
-            var userService = new UserService(mockUserRepo.Object, mapper,
+            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act
@@ -192,11 +198,13 @@ namespace Tests
 
         /* For update profile */
         private Mock<IUserRepository>? _mockUserRepoForUpdateProfileTest;
+        private Mock<ILevelRepository>? _mockLevelRepo;
         private Mapper? _mapperForUpdateProfileTest;
         private Mock<IJwtUtils>? _mockJwtUtil;
         private Mock<IBcryptWrapper>? _mockBcryptWrapper;
 
         private UpdateProfileRequestDTO? _updateProfileRequestDTO;
+        private uint _userIdForUpdateProfileTest;
         private User? _userForUpdateProfileTest;
         private UserService? _userServiceForUpdateProfileTest;
         private bool _isOldPasswordMatchesWithItsEncrypt;
@@ -274,7 +282,7 @@ namespace Tests
 
         private async Task UpdateProfileForUpdateProfileTest()
         {
-            await _userServiceForUpdateProfileTest!.UpdateProfile(_userForUpdateProfileTest, _updateProfileRequestDTO!);
+            await _userServiceForUpdateProfileTest!.UpdateProfile(_userIdForUpdateProfileTest, _updateProfileRequestDTO!);
         }
 
         private void AssertHttpExceptionComesFromUpdateProfileIncorrectOldPasswordHandler()
@@ -297,8 +305,8 @@ namespace Tests
 
         private void InitializeUpdateProfileTest()
         {
-            InitializeMockAndMapperForUpdateProfileTest();
             InitializeUserForUpdateProfileTest();
+            InitializeMockAndMapperForUpdateProfileTest();
             InitializeRequestDTOForUpdateProfileTest();
             SetupMockForUpdateProfileTest();
             InitializeUserServiceForUpdateProfileTest();
@@ -313,6 +321,7 @@ namespace Tests
             );
             _mockJwtUtil = new Mock<IJwtUtils>();
             _mockBcryptWrapper = new Mock<IBcryptWrapper>();
+            _mockLevelRepo = new Mock<ILevelRepository>();
         }
 
         private void InitializeUserForUpdateProfileTest()
@@ -338,15 +347,35 @@ namespace Tests
 
         private void SetupMockForUpdateProfileTest()
         {
-            _mockUserRepoForUpdateProfileTest!.Setup(p => p.Get(UserIdForUpdateProfileTest)).ReturnsAsync(_userForUpdateProfileTest!);
+            //_mockUserRepoForUpdateProfileTest!.Setup(p => p.GetById(UserIdForUpdateProfileTest)).ReturnsAsync(_userForUpdateProfileTest!);
+            _mockUserRepoForUpdateProfileTest!.Setup(p => p.GetById(_userIdForUpdateProfileTest)).ReturnsAsync(_userForUpdateProfileTest!);
             _mockBcryptWrapper!.Setup(p => p.isPasswordCorrect(OldPasswordForUpdateProfileTest, OldEncryptedPasswordForUpdateProfileTest)).Returns(_isOldPasswordMatchesWithItsEncrypt);
             _mockBcryptWrapper!.Setup(p => p.hashPassword(NewPasswordForUpdateProfileTest)).Returns(NewEncryptedPasswordForUpdateProfileTest);
             _mockJwtUtil!.Setup(p => p.GenerateToken(_userForUpdateProfileTest!)).Returns(TokenForUpdateProfileTest);
+            /*            _mockUserRepo!.Setup(p => p.GetById(_userIdForUpdateProfileTest)).ReturnsAsync(
+                            new User
+                            {
+                                Id = UserIdForUpdateProfileTest,
+                                EncryptedPassword = OldEncryptedPasswordForUpdateProfileTest,
+                                DisplayName = OldDisplayNameForUpdateProfileTest,
+                                Type = _hasGoogleAccount ? User.LoginType.Google : User.LoginType.Standard
+                            }
+                         )
+
+
+                            .ReturnsAsync(new User
+                        {
+                            Id = UserIdForUpdateProfileTest,
+                            EncryptedPassword = OldEncryptedPasswordForUpdateProfileTest,
+                            DisplayName = OldDisplayNameForUpdateProfileTest,
+                            Type = _hasGoogleAccount ? User.LoginType.Google : User.LoginType.Standard
+                        }));
+                    }*/
         }
 
         private void InitializeUserServiceForUpdateProfileTest()
         {
-            _userServiceForUpdateProfileTest = new UserService(_mockUserRepoForUpdateProfileTest!.Object, _mapperForUpdateProfileTest!,
+            _userServiceForUpdateProfileTest = new UserService(_mockUserRepoForUpdateProfileTest!.Object, _mockLevelRepo!.Object, _mapperForUpdateProfileTest!,
                 _mockJwtUtil!.Object, _mockBcryptWrapper!.Object);
         }
     }

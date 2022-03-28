@@ -15,10 +15,13 @@ namespace App.Authorization
         {
             var token = ctx.Request.Headers["Authorization"].FirstOrDefault()?.Split(' ').Last();
             var userId = jwtUtils.ValidateToken(token);
-            if(userId != null)
+
+            // i don't think it's good idea to hit DB for every request, so ill just save the userId in ctx
+            ctx.Items["userId"] = userId;
+/*            if(userId != null)
             {
                 ctx.Items["User"] = await _userRepository.GetById(userId.Value);
-            }
+            }*/
 
             await _next(ctx);
         }

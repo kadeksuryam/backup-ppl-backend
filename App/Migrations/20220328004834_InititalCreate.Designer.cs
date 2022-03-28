@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220327164138_InititalCreate")]
+    [Migration("20220328004834_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -282,6 +282,48 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+                });
+
+            modelBuilder.Entity("App.Models.Voucher", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("code");
+
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("IsUsed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_used");
+
+                    b.Property<string>("UpdatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("vouchers", (string)null);
                 });
 
             modelBuilder.Entity("App.Models.BankTopUpRequest", b =>

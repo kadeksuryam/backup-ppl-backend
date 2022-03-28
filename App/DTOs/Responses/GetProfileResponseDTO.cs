@@ -2,7 +2,7 @@
 
 namespace App.DTOs.Responses
 {
-    public class ViewProfileResponseDTO
+    public class GetProfileResponseDTO
     {
         [JsonPropertyName("id")]
         public uint Id { get; set; }
@@ -15,7 +15,7 @@ namespace App.DTOs.Responses
         [JsonPropertyName("balance")]
         public uint Balance { get; set; }
         [JsonPropertyName("exp")]
-        public uint EXP { get; set; }
+        public uint Exp { get; set; }
         [JsonPropertyName("level")]
         public string Level { get; set; }
 
