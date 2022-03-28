@@ -23,11 +23,12 @@ namespace App.Models
         public BankTopUpRequest? BankRequest { get; set; }
 
         // Only for voucher
-        // public Voucher? UsedVoucher { get; set; }
+        [ForeignKey("VoucherId")]
+        public Voucher? Voucher { get; set; }
 
         // For foreign key
         public uint FromUserId { get; set; }
         public uint? BankRequestId { get; set; }
-        // public uint UsedVoucherId { get; set; }
+        public uint? VoucherId { get; set; }
     }
 }

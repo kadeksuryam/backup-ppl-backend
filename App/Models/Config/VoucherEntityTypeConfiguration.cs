@@ -38,6 +38,15 @@ namespace App.Models.Config
                 .IsRequired()
                 .HasColumnName("is_used")
                 .HasDefaultValue(false);
+
+            ConfigureRelations(builder);
+        }
+
+        private static void ConfigureRelations(EntityTypeBuilder<Voucher> builder)
+        {
+            builder.HasOne(v => v.History)
+                .WithOne(h => h.Voucher)
+                .HasForeignKey<TopUpHistory>(h => h.VoucherId);
         }
     }
 }

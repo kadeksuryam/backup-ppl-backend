@@ -201,6 +201,10 @@ namespace App.Migrations
                         .HasColumnType("character varying(48)")
                         .HasColumnName("updated_at");
 
+                    b.Property<long?>("VoucherId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("voucher_id");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BankRequestId")
@@ -209,6 +213,9 @@ namespace App.Migrations
                     b.HasIndex("FromUserId");
 
                     b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("VoucherId")
                         .IsUnique();
 
                     b.ToTable("topup_histories", (string)null);
@@ -355,9 +362,15 @@ namespace App.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("App.Models.Voucher", "Voucher")
+                        .WithOne("History")
+                        .HasForeignKey("App.Models.TopUpHistory", "VoucherId");
+
                     b.Navigation("BankRequest");
 
                     b.Navigation("From");
+
+                    b.Navigation("Voucher");
                 });
 
             modelBuilder.Entity("App.Models.User", b =>
@@ -391,6 +404,11 @@ namespace App.Migrations
                     b.Navigation("BankTopUpRequests");
 
                     b.Navigation("TopUpHistories");
+                });
+
+            modelBuilder.Entity("App.Models.Voucher", b =>
+                {
+                    b.Navigation("History");
                 });
 #pragma warning restore 612, 618
         }

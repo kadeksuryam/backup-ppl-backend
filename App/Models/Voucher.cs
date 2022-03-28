@@ -8,5 +8,6 @@
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public bool IsUsed { get; set; }
+        public TopUpHistory? History { get; set; }
     }
 }

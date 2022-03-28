@@ -122,7 +122,8 @@ namespace App.Migrations
                     amount = table.Column<int>(type: "integer", nullable: false),
                     method = table.Column<string>(type: "text", nullable: false),
                     from_user_id = table.Column<long>(type: "bigint", nullable: false),
-                    bank_request_id = table.Column<long>(type: "bigint", nullable: true)
+                    bank_request_id = table.Column<long>(type: "bigint", nullable: true),
+                    voucher_id = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -138,6 +139,11 @@ namespace App.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_topup_histories_vouchers_voucher_id",
+                        column: x => x.voucher_id,
+                        principalTable: "vouchers",
+                        principalColumn: "id");
                 });
 
             migrationBuilder.InsertData(
@@ -197,6 +203,12 @@ namespace App.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_topup_histories_voucher_id",
+                table: "topup_histories",
+                column: "voucher_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_users_email",
                 table: "users",
                 column: "email",
@@ -232,10 +244,10 @@ namespace App.Migrations
                 name: "topup_histories");
 
             migrationBuilder.DropTable(
-                name: "vouchers");
+                name: "bank_topup_request");
 
             migrationBuilder.DropTable(
-                name: "bank_topup_request");
+                name: "vouchers");
 
             migrationBuilder.DropTable(
                 name: "banks");

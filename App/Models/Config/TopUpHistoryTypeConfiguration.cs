@@ -66,7 +66,9 @@ namespace App.Models.Config
 
         private static void ConfigureVoucherTopUpAttributes(EntityTypeBuilder<TopUpHistory> builder)
         {
-            // Add voucher id attribute here
+            builder.Property(b => b.VoucherId)
+                .IsRequired(false)
+                .HasColumnName("voucher_id");
         }
 
         private static void ConfigureRelations(EntityTypeBuilder<TopUpHistory> builder)
@@ -92,7 +94,9 @@ namespace App.Models.Config
 
         private static void ConfigureVoucherTopUpRelations(EntityTypeBuilder<TopUpHistory> builder)
         {
-            // Implement voucher connection here.
+            builder.HasOne(h => h.Voucher)
+                .WithOne(r => r.History)
+                .HasForeignKey<TopUpHistory>(h => h.VoucherId);
         }
     }
 }
