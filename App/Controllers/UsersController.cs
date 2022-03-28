@@ -69,7 +69,7 @@ namespace App.Controllers
                 throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "At least one attribute needs to be updated");
             }
 
-            if(!(dto.OldPassword != null && dto.NewPassword != null))
+            if((dto.OldPassword == null && dto.NewPassword != null) || (dto.OldPassword != null && dto.NewPassword == null))
             {
                 throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Updating password needs two attribute, 'old_password' and 'new_password'");
             }
