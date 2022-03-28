@@ -18,11 +18,6 @@ namespace App.Authorization
 
             // i don't think it's good idea to hit DB for every request, so ill just save the userId in ctx
             ctx.Items["userId"] = userId;
-/*            if(userId != null)
-            {
-                ctx.Items["User"] = await _userRepository.GetById(userId.Value);
-            }*/
-
             await _next(ctx);
         }
     }
