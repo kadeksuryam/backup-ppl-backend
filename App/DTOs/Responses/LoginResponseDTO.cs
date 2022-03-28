@@ -12,6 +12,8 @@ namespace App.DTOs.Responses
         public string Email { get; set; }
         [JsonPropertyName("jwt_token")]
         public string Token { get; set; }
+        [JsonPropertyName("role")]
+        public string role { get; set; }
 
     }
 }

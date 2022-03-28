@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace App.Controllers
 {
-    [Authorize]
+    [Authorize(Role = "Customer")]
     [ApiController]
     [Route("users")]
     public class UsersController : ControllerBase
@@ -41,7 +41,10 @@ namespace App.Controllers
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetProfile(uint userId)
         {
-            uint? currUserId = (uint)HttpContext.Items["userId"];
+            ParsedToken? parsedToken = HttpContext.Items["userAttr"] as ParsedToken;
+
+
+            uint? currUserId = parsedToken.userId;
 
             if(currUserId != userId)
             {
@@ -57,7 +60,10 @@ namespace App.Controllers
         [HttpPatch("{userId}")]
         public async Task<IActionResult> UpdateProfile(uint userId, [FromBody] UpdateProfileRequestDTO dto)
         {
-            uint? currUserId = (uint)HttpContext.Items["userId"];
+            ParsedToken? parsedToken = HttpContext.Items["userAttr"] as ParsedToken;
+
+
+            uint? currUserId = parsedToken.userId;
 
             if (currUserId != userId)
             {

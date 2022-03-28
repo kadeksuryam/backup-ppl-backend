@@ -24,7 +24,7 @@ namespace App.Authorization
             var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()) }),
+                Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()), new Claim("role", user.Role.ToString()) }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -32,7 +32,7 @@ namespace App.Authorization
             return tokenHandler.WriteToken(token);
         }
 
-        public uint? ValidateToken(string token)
+        public ParsedToken? ValidateToken(string? token)
         {
             if (token == null) return null;
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -47,9 +47,17 @@ namespace App.Authorization
                     ClockSkew = TimeSpan.Zero
                 }, out SecurityToken validatedToken);
                 var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = uint.Parse(jwtToken.Claims.First(x => x.Type == "id").Value);
+       
+                uint? userId = null;
+                uint tmpUserId;
+                if(uint.TryParse(jwtToken.Claims.First(x => x.Type == "id").Value, out tmpUserId))
+                {
+                    userId = tmpUserId;
+                }
+                var userRole = jwtToken.Claims.Last(x => x.Type == "role").Value;
 
-                return userId;
+                return new ParsedToken(userId, userRole);
+
             } catch (Exception ex)
             {
                 return null;

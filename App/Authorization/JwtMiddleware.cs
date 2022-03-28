@@ -1,4 +1,6 @@
-﻿using App.Repositories;
+﻿using App.Helpers;
+using App.Repositories;
+using System.Net;
 
 namespace App.Authorization
 {
@@ -13,11 +15,11 @@ namespace App.Authorization
 
         public async Task Invoke(HttpContext ctx, IUserRepository _userRepository, IJwtUtils jwtUtils)
         {
-            var token = ctx.Request.Headers["Authorization"].FirstOrDefault()?.Split(' ').Last();
-            var userId = jwtUtils.ValidateToken(token);
+            string? token = ctx.Request.Headers["Authorization"].FirstOrDefault()?.Split(' ').Last();
+            ParsedToken? parsedToken = jwtUtils.ValidateToken(token);
 
-            // i don't think it's good idea to hit DB for every request, so ill just save the userId in ctx
-            ctx.Items["userId"] = userId;
+            ctx.Items["userAttr"] = parsedToken;
+
             await _next(ctx);
         }
     }
