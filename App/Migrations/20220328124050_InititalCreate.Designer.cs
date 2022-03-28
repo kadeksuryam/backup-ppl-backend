@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220328063555_InititalCreate")]
+    [Migration("20220328124050_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -263,6 +263,13 @@ namespace App.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("levelId");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Customer")
+                        .HasColumnName("user_role");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -289,6 +296,21 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Balance = 0L,
+                            DisplayName = "Admin",
+                            Email = "admin@cakrawala.id",
+                            EncryptedPassword = "$2a$11$x.u26rjwyYwJnb7zZy7mye/4bIfOuUCahfhFipbomKnbP44EU.qka",
+                            Exp = 0L,
+                            LevelId = 1L,
+                            Role = "Admin",
+                            Type = "Standard",
+                            UserName = "cakrawalaid"
+                        });
                 });
 
             modelBuilder.Entity("App.Models.Voucher", b =>

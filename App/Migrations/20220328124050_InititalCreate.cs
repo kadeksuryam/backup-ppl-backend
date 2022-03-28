@@ -67,7 +67,8 @@ namespace App.Migrations
                     balance = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
                     exp = table.Column<long>(type: "bigint", nullable: false, defaultValue: 0L),
                     levelId = table.Column<long>(type: "bigint", nullable: false),
-                    login_type = table.Column<string>(type: "text", nullable: false, defaultValue: "Standard")
+                    login_type = table.Column<string>(type: "text", nullable: false, defaultValue: "Standard"),
+                    user_role = table.Column<string>(type: "text", nullable: false, defaultValue: "Customer")
                 },
                 constraints: table =>
                 {
@@ -162,6 +163,11 @@ namespace App.Migrations
                     { 5L, "Diamond", 400L },
                     { 6L, "Crazy Rich", 500L }
                 });
+
+            migrationBuilder.InsertData(
+                table: "users",
+                columns: new[] { "id", "display_name", "email", "encrypted_password", "levelId", "user_role", "username" },
+                values: new object[] { 1L, "Admin", "admin@cakrawala.id", "$2a$11$x.u26rjwyYwJnb7zZy7mye/4bIfOuUCahfhFipbomKnbP44EU.qka", 1L, "Admin", "cakrawalaid" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_bank_topup_request_bank_id",
