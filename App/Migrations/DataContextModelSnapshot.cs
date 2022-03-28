@@ -21,6 +21,84 @@ namespace App.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("App.Models.Bank", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("AccountNumber")
+                        .HasColumnType("bigint")
+                        .HasColumnName("account_number");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("banks", (string)null);
+                });
+
+            modelBuilder.Entity("App.Models.BankTopUpRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer")
+                        .HasColumnName("amount");
+
+                    b.Property<long>("BankId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("bank_id");
+
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ExpiredDate")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("expired_date");
+
+                    b.Property<long>("FromUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("from_user_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Pending")
+                        .HasColumnName("status");
+
+                    b.Property<string>("UpdatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BankId");
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.ToTable("bank_topup_request", (string)null);
+                });
+
             modelBuilder.Entity("App.Models.Level", b =>
                 {
                     b.Property<long>("Id")
@@ -85,6 +163,62 @@ namespace App.Migrations
                             Name = "Crazy Rich",
                             RequiredExp = 500L
                         });
+                });
+
+            modelBuilder.Entity("App.Models.TopUpHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("integer")
+                        .HasColumnName("amount");
+
+                    b.Property<long?>("BankRequestId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("bank_request_id");
+
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("created_at");
+
+                    b.Property<long>("FromUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("from_user_id");
+
+                    b.Property<string>("Method")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("method");
+
+                    b.Property<string>("UpdatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("updated_at");
+
+                    b.Property<long?>("VoucherId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("voucher_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BankRequestId")
+                        .IsUnique();
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("VoucherId")
+                        .IsUnique();
+
+                    b.ToTable("topup_histories", (string)null);
                 });
 
             modelBuilder.Entity("App.Models.User", b =>
@@ -197,6 +331,48 @@ namespace App.Migrations
                     b.ToTable("vouchers", (string)null);
                 });
 
+            modelBuilder.Entity("App.Models.BankTopUpRequest", b =>
+                {
+                    b.HasOne("App.Models.Bank", "Bank")
+                        .WithMany("BankTopUpRequests")
+                        .HasForeignKey("BankId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("App.Models.User", "From")
+                        .WithMany("BankTopUpRequests")
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bank");
+
+                    b.Navigation("From");
+                });
+
+            modelBuilder.Entity("App.Models.TopUpHistory", b =>
+                {
+                    b.HasOne("App.Models.BankTopUpRequest", "BankRequest")
+                        .WithOne("History")
+                        .HasForeignKey("App.Models.TopUpHistory", "BankRequestId");
+
+                    b.HasOne("App.Models.User", "From")
+                        .WithMany("TopUpHistories")
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("App.Models.Voucher", "Voucher")
+                        .WithOne("History")
+                        .HasForeignKey("App.Models.TopUpHistory", "VoucherId");
+
+                    b.Navigation("BankRequest");
+
+                    b.Navigation("From");
+
+                    b.Navigation("Voucher");
+                });
+
             modelBuilder.Entity("App.Models.User", b =>
                 {
                     b.HasOne("App.Models.Level", "Level")
@@ -208,9 +384,31 @@ namespace App.Migrations
                     b.Navigation("Level");
                 });
 
+            modelBuilder.Entity("App.Models.Bank", b =>
+                {
+                    b.Navigation("BankTopUpRequests");
+                });
+
+            modelBuilder.Entity("App.Models.BankTopUpRequest", b =>
+                {
+                    b.Navigation("History");
+                });
+
             modelBuilder.Entity("App.Models.Level", b =>
                 {
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("App.Models.User", b =>
+                {
+                    b.Navigation("BankTopUpRequests");
+
+                    b.Navigation("TopUpHistories");
+                });
+
+            modelBuilder.Entity("App.Models.Voucher", b =>
+                {
+                    b.Navigation("History");
                 });
 #pragma warning restore 612, 618
         }
