@@ -80,20 +80,28 @@
         {
             User userDb = await _userRepository.GetById(userId);
 
-            if (!_bcryptWrapper.isPasswordCorrect(dto.OldPassword, userDb!.EncryptedPassword))
-            {
-                throw GetUpdateProfileIncorrectOldPasswordException();
-            }
-            else if (HasGoogleLoginType(userDb))
+            if(HasGoogleLoginType(userDb))
             {
                 throw GetUpdateProfileGoogleLoginTypeException();
             }
-            else
+
+            if(dto.NewDisplayName != null)
             {
                 userDb.DisplayName = dto.NewDisplayName;
-                userDb.EncryptedPassword = _bcryptWrapper.hashPassword(dto.NewPassword);
-                await _userRepository.Update(userDb);
             }
+
+            if (dto.NewPassword != null && dto.OldPassword != null)
+            {
+                if(_bcryptWrapper.isPasswordCorrect(dto.OldPassword, userDb!.EncryptedPassword))
+                {
+                    userDb.EncryptedPassword = _bcryptWrapper.hashPassword(dto.NewPassword);
+                }
+                else
+                {
+                    throw GetUpdateProfileIncorrectOldPasswordException();
+                }
+            }
+            await _userRepository.Update(userDb);
         }
 
         public async Task<GetProfileResponseDTO> GetProfile(uint userId)
