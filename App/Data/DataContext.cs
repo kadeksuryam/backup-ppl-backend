@@ -16,7 +16,6 @@ namespace App.Data
 
         public DbSet<Bank> Banks { get; set; }
 
-
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
         }

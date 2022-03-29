@@ -64,5 +64,10 @@ namespace App.Repositories
         {
             return await _context.Users.Where(b => b.Email == email).FirstOrDefaultAsync();
         }
+
+        public async Task<IEnumerable<User>> GetAll(List<uint> userIds)
+        {
+            return await _context.Users.Where(b => userIds.Contains(b.Id)).ToListAsync();
+        }
     }
 }
