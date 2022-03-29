@@ -113,6 +113,36 @@ namespace App.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "transaction_histories",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    created_at = table.Column<string>(type: "character varying(48)", nullable: false),
+                    updated_at = table.Column<string>(type: "character varying(48)", nullable: false),
+                    amount = table.Column<long>(type: "bigint", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
+                    from_user_id = table.Column<long>(type: "bigint", nullable: false),
+                    to_user_id = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_transaction_histories", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_transaction_histories_users_from_user_id",
+                        column: x => x.from_user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_transaction_histories_users_to_user_id",
+                        column: x => x.to_user_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "topup_histories",
                 columns: table => new
                 {
@@ -167,7 +197,7 @@ namespace App.Migrations
             migrationBuilder.InsertData(
                 table: "users",
                 columns: new[] { "id", "display_name", "email", "encrypted_password", "levelId", "user_role", "username" },
-                values: new object[] { 1L, "Admin", "admin@cakrawala.id", "$2a$11$x.u26rjwyYwJnb7zZy7mye/4bIfOuUCahfhFipbomKnbP44EU.qka", 1L, "Admin", "cakrawalaid" });
+                values: new object[] { 1L, "Admin", "admin@cakrawala.id", "$2a$11$.nWXdiugSDywY9di7sJ8juOCBR/Y1VnAwvKTZKBrQzHPRrFSrIK6S", 1L, "Admin", "cakrawalaid" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_bank_topup_request_bank_id",
@@ -215,6 +245,22 @@ namespace App.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_transaction_histories_from_user_id",
+                table: "transaction_histories",
+                column: "from_user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_transaction_histories_id",
+                table: "transaction_histories",
+                column: "id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_transaction_histories_to_user_id",
+                table: "transaction_histories",
+                column: "to_user_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_users_email",
                 table: "users",
                 column: "email",
@@ -248,6 +294,9 @@ namespace App.Migrations
         {
             migrationBuilder.DropTable(
                 name: "topup_histories");
+
+            migrationBuilder.DropTable(
+                name: "transaction_histories");
 
             migrationBuilder.DropTable(
                 name: "bank_topup_request");

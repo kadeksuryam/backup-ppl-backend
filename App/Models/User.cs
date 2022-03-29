@@ -39,5 +39,8 @@ namespace App.Models
         public UserRole Role { get; set; }  
         public List<TopUpHistory>? TopUpHistories { get; set; }
         public List<BankTopUpRequest>? BankTopUpRequests { get; set; }
+        public List<TransactionHistory>? TransactionHistoriesFrom { get; set; }
+
+        public List<TransactionHistory>? TransactionHistoriesTo { get; set; }
     } 
 }

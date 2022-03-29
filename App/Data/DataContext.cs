@@ -34,6 +34,7 @@ namespace App.Data
             new BankTopUpRequestTypeConfiguration().Configure(modelBuilder.Entity<BankTopUpRequest>());
             new BankTypeConfiguration().Configure(modelBuilder.Entity<Bank>());
             new VoucherEntityTypeConfiguration().Configure(modelBuilder.Entity<Voucher>());
+            new TransactionHistoryTypeConfiguration().Configure(modelBuilder.Entity<TransactionHistory>());
         }
         #endregion
     }
