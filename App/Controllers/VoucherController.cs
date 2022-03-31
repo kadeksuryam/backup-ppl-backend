@@ -23,11 +23,6 @@ namespace App.Controllers
         {
             var voucher = await _voucherService.GetByCode(code);
 
-            if (voucher == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Voucher not found");
-            }
-
             return Ok(voucher);
         }
     }

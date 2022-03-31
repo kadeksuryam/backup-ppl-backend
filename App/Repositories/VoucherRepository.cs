@@ -15,5 +15,12 @@ namespace App.Repositories
         {
             return await _context.Vouchers.Where(v => v.Code == code).FirstOrDefaultAsync();
         }
+
+        public async Task<Voucher> Update(Voucher entity)
+        {
+            _context.Vouchers.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
     }
 }
