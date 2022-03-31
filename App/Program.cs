@@ -22,6 +22,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<IDataContext>(provider => provider.GetService<DataContext>());
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<ILevelRepository, LevelRepository>();
+    services.AddScoped<IBankRepository, BankRepository>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IBankTopUpService, BankTopUpService>();
     services.AddScoped<IBcryptWrapper, BcryptWrapper>();

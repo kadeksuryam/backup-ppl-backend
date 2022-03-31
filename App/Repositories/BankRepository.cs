@@ -1,12 +1,20 @@
-﻿using App.Models;
+﻿using App.Data;
+using App.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Repositories
 {
     public class BankRepository : IBankRepository
     {
-        public Task<Bank?> GetById(uint id)
+        private readonly IDataContext _context;
+        public BankRepository(DataContext context)
         {
-            throw new NotImplementedException();
+            _context = context;
+        }
+
+        public async Task<Bank?> GetById(uint id)
+        {
+            return await _context.Banks.Where(b => b.Id == id).FirstAsync();
         }
     }
 }
