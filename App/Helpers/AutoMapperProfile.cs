@@ -19,6 +19,8 @@ namespace App.Helpers
             CreateMap<User, GetProfileResponseDTO>()
                 .ForMember(dest =>
                     dest.Level, opt => opt.Ignore());
+
+            CreateMap<User, BankTopUpResponseDTO>();
         }
 
     }
