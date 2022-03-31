@@ -20,7 +20,11 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.Level, opt => opt.Ignore());
 
-            CreateMap<User, BankTopUpResponseDTO>();
+            CreateMap<BankTopUpRequestDTO, BankTopUpRequest>();
+            CreateMap<BankTopUpRequest, BankTopUpResponseDTO>()
+                .ForMember(dest =>
+                    dest.ExpiredDate, opt => opt.MapFrom(src =>
+                        src.ExpiredDate.ToString("dd/MM/yyyy, HH:mm")));
         }
 
     }

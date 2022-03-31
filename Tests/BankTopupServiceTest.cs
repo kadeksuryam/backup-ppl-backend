@@ -7,9 +7,6 @@ using App.Services;
 using AutoMapper;
 using Moq;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -20,38 +17,16 @@ namespace Tests
         private Mock<IBankRepository>? mockBankRepo;
         private Bank? mockBank;
         public Mock<IUserRepository>? mockUserRepo;
-        private User? user;
         private Mock<IBankTopUpRequestRepository>? mockBankRequestRepo;
 
         [Fact]
         public async Task BankTopUp_ValidRequest_ReturnsSuccessAsync()
         {
-            uint userId = GetAuthenticatedUserId();
+            uint userId = 1234;
             BankTopUpRequestDTO request = GetValidBankTopUpRequest();
             BankTopUpResponseDTO response = await MakeBankTopUp(userId, request);
             AssertValidBankTopUpResponse(response);
             AssertExactlyOneBankTopUpRequestAdded();
-        }
-
-        private uint GetAuthenticatedUserId()
-        {
-            uint userId = 1234;
-            MakeUserIdAuthenticated(userId);
-            return userId;
-        }
-
-        private void MakeUserIdAuthenticated(uint userId)
-        {
-            mockUserRepo = new();
-            user = CreateUser(userId);
-            mockUserRepo.Setup(repo => repo.GetById(userId)).ReturnsAsync(user);
-        }
-
-        private User CreateUser(uint userId)
-        {
-            User user = new();
-            user.Id = userId;
-            return user;
         }
 
         private BankTopUpRequestDTO GetValidBankTopUpRequest()
@@ -86,12 +61,11 @@ namespace Tests
             return new BankTopUpService(
                 mockBankRepo!.Object,
                 mockBankRequestRepo.Object,
-                mockUserRepo!.Object,
                 mapper
             );
         }
 
-        private Mapper CreateMapper()
+        private static Mapper CreateMapper()
         {
             MapperConfiguration mapperConfig = new(config =>
             {
@@ -111,7 +85,7 @@ namespace Tests
             Assert.Equal(mockBank!.AccountNumber, actualAccountNumber);
         }
 
-        private void AssertParseableToDateTime(string expiredDate)
+        private static void AssertParseableToDateTime(string expiredDate)
         {
             Assert.True(DateTime.TryParse(expiredDate, out _));
         }

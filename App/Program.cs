@@ -23,6 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<ILevelRepository, LevelRepository>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IBankTopUpService, BankTopUpService>();
     services.AddScoped<IBcryptWrapper, BcryptWrapper>();
     services.AddAutoMapper(typeof(Program));
 
