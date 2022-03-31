@@ -14,6 +14,8 @@ namespace App.Data
 
         public DbSet<BankTopUpRequest> BankTopUpRequests { get; set; }
 
+        public DbSet<TransactionHistory> TransactionHistories { get; set; }
+
         public DbSet<Bank> Banks { get; set; }
 
         public DbSet<Voucher> Vouchers { get; set; }
