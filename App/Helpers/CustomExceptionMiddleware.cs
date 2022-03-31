@@ -23,6 +23,8 @@ namespace App.Helpers
             }
             catch (Exception exceptionObj)
             {
+                // Print stacktrace for debugging purpose
+                Console.WriteLine(exceptionObj.ToString());
                 await HandleExceptionAsync(context, exceptionObj);
             }
         }

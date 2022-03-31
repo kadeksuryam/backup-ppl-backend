@@ -22,6 +22,8 @@ namespace App.Helpers
 
             CreateMap<User, GetBankTopUpRequestResponseDTO.UserDTO>();
             CreateMap<Bank, GetBankTopUpRequestResponseDTO.BankDTO>();
+
+            CreateMap<Voucher, GetVoucherResponseDTO>();
         }
 
     }
