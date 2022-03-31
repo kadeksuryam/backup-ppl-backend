@@ -3,7 +3,7 @@ using App.DTOs.Responses;
 
 namespace App.Services
 {
-    public interface IBankTopUpService
+    public interface ITopUpService
     {
         Task<BankTopUpResponseDTO> BankTopUp(uint userId, BankTopUpRequestDTO request);
     }

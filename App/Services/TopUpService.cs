@@ -9,7 +9,7 @@ using System.Net;
 
 namespace App.Services
 {
-    public class BankTopUpService : IBankTopUpService
+    public class TopUpService : ITopUpService
     {
         private readonly IBankRepository _bankRepo;
         private readonly IBankTopUpRequestRepository _bankRequestRepo;
@@ -17,7 +17,7 @@ namespace App.Services
 
         private Bank? SelectedBank;
 
-        public BankTopUpService(IBankRepository bankRepo, IBankTopUpRequestRepository bankRequestRepo, IMapper mapper)
+        public TopUpService(IBankRepository bankRepo, IBankTopUpRequestRepository bankRequestRepo, IMapper mapper)
         {
             _bankRepo = bankRepo;
             _bankRequestRepo = bankRequestRepo;

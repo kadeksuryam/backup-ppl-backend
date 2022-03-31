@@ -12,7 +12,7 @@ using Xunit;
 
 namespace Tests
 {
-    public class BankTopupServiceTest
+    public class TopUpServiceTest
     {
         private Mock<IBankRepository>? mockBankRepo;
         private Bank? mockBank;
@@ -50,15 +50,15 @@ namespace Tests
 
         private async Task<BankTopUpResponseDTO> MakeBankTopUp(uint userId, BankTopUpRequestDTO request)
         {
-            return await GetBankTopUpService().BankTopUp(userId, request);
+            return await GetTopUpService().BankTopUp(userId, request);
         }
 
-        private BankTopUpService GetBankTopUpService()
+        private TopUpService GetTopUpService()
         {
             Mapper mapper = CreateMapper();
             mockBankRequestRepo = new();
 
-            return new BankTopUpService(
+            return new TopUpService(
                 mockBankRepo!.Object,
                 mockBankRequestRepo.Object,
                 mapper
