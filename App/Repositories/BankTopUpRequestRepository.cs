@@ -1,5 +1,7 @@
 ﻿using App.Data;
 using App.Models;
+using App.Models.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Repositories
 {
@@ -20,6 +22,15 @@ namespace App.Repositories
         public Task<IEnumerable<BankTopUpRequest>> GetAllPending()
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<IEnumerable<BankTopUpRequest>> GetAll(RequestStatus? requestStatus)
+        {
+            return await _context.BankTopUpRequests
+                .Where(b => b.Status.Equals(requestStatus))
+                .Include(b => b.Bank)
+                .Include(b => b.From)
+                .ToListAsync();
         }
     }
 }

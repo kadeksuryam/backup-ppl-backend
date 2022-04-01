@@ -1,3 +1,4 @@
+using App.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -5,6 +6,8 @@ namespace App.Models.Config
 {
     public class UserEntityTypeConfiguration : IEntityTypeConfiguration<User>
     {
+        private readonly IBcryptWrapper _bcryptWrapper = new BcryptWrapper();
+
         public void Configure(EntityTypeBuilder<User> builder)
         {
             builder.ToTable("users");
@@ -59,6 +62,11 @@ namespace App.Models.Config
                .HasColumnName("login_type")
                .HasDefaultValue(User.LoginType.Standard)
                .HasConversion<string>();
+            builder.Property(b => b.Role)
+                .IsRequired()
+                .HasColumnName("user_role")
+                .HasDefaultValue(User.UserRole.Customer)
+                .HasConversion<string>();
 
             builder.HasMany(u => u.TopUpHistories)
                 .WithOne(h => h.From)
@@ -67,6 +75,25 @@ namespace App.Models.Config
             builder.HasMany(u => u.BankTopUpRequests)
                 .WithOne(r => r.From)
                 .HasForeignKey(r => r.FromUserId);
+
+            AddSeed(builder);
+        }
+
+        private void AddSeed(EntityTypeBuilder<User> builder)
+        {
+            builder.HasData(new User
+            {
+                Id = 1,
+                UserName = "cakrawalaid",
+                EncryptedPassword = _bcryptWrapper.hashPassword("ppl2022"),
+                DisplayName = "Admin",
+                Email = "admin@cakrawala.id",
+                Balance = 0,
+                Exp = 0,
+                LevelId = 1,
+                Type = User.LoginType.Standard,
+                Role = User.UserRole.Admin,
+            });
         }
     }
 }

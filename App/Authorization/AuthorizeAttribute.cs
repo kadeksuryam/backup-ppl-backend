@@ -9,6 +9,7 @@ namespace App.Authorization
 
     public class AuthorizeAttribute : Attribute, IAuthorizationFilter
     {
+        public string Role { get; set; }
         public void OnAuthorization(AuthorizationFilterContext ctx)
         {
             // skip authorization if controller decorated with [AllowAnonymous] attribute
@@ -16,10 +17,25 @@ namespace App.Authorization
             if (allowAnonymous) return;
 
             // authorization
-            var userId = ctx.HttpContext.Items["userId"];
-            if(userId == null)
+            ParsedToken? parsedToken = ctx.HttpContext.Items["userAttr"] as ParsedToken;
+
+
+            if(parsedToken == null)
             {
-                throw new HttpStatusCodeException(HttpStatusCode.Unauthorized, "Unauthorized");
+                throw new HttpStatusCodeException(HttpStatusCode.Unauthorized, "Need authentication");
+            }
+
+            var userId = parsedToken.userId;
+            var userRole = parsedToken.userRole;
+
+            if (userId == null || userRole == null)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.Unauthorized, "Need authentication");
+            }
+
+            if(userRole.Equals("Customer") && Role.Equals("Admin"))
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "Admin Operation Only");
             }
         }
     }

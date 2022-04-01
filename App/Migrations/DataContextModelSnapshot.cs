@@ -221,6 +221,54 @@ namespace App.Migrations
                     b.ToTable("topup_histories", (string)null);
                 });
 
+            modelBuilder.Entity("App.Models.TransactionHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("bigint")
+                        .HasColumnName("amount");
+
+                    b.Property<string>("CreatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("created_at");
+
+                    b.Property<long>("FromUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("from_user_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<long>("ToUserId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("to_user_id");
+
+                    b.Property<string>("UpdatedAt")
+                        .IsRequired()
+                        .HasColumnType("character varying(48)")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("Id")
+                        .IsUnique();
+
+                    b.HasIndex("ToUserId");
+
+                    b.ToTable("transaction_histories", (string)null);
+                });
+
             modelBuilder.Entity("App.Models.User", b =>
                 {
                     b.Property<long>("Id")
@@ -261,6 +309,13 @@ namespace App.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("levelId");
 
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("Customer")
+                        .HasColumnName("user_role");
+
                     b.Property<string>("Type")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -287,6 +342,21 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("users", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Balance = 0L,
+                            DisplayName = "Admin",
+                            Email = "admin@cakrawala.id",
+                            EncryptedPassword = "$2a$11$8q8wtz/18sC0Ih2cgejiV.SoqP8SbHNOhM8RxqkE0exo0iyQ6/eNK",
+                            Exp = 0L,
+                            LevelId = 1L,
+                            Role = "Admin",
+                            Type = "Standard",
+                            UserName = "cakrawalaid"
+                        });
                 });
 
             modelBuilder.Entity("App.Models.Voucher", b =>
@@ -373,6 +443,25 @@ namespace App.Migrations
                     b.Navigation("Voucher");
                 });
 
+            modelBuilder.Entity("App.Models.TransactionHistory", b =>
+                {
+                    b.HasOne("App.Models.User", "From")
+                        .WithMany("TransactionHistoriesFrom")
+                        .HasForeignKey("FromUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("App.Models.User", "To")
+                        .WithMany("TransactionHistoriesTo")
+                        .HasForeignKey("ToUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("From");
+
+                    b.Navigation("To");
+                });
+
             modelBuilder.Entity("App.Models.User", b =>
                 {
                     b.HasOne("App.Models.Level", "Level")
@@ -404,6 +493,10 @@ namespace App.Migrations
                     b.Navigation("BankTopUpRequests");
 
                     b.Navigation("TopUpHistories");
+
+                    b.Navigation("TransactionHistoriesFrom");
+
+                    b.Navigation("TransactionHistoriesTo");
                 });
 
             modelBuilder.Entity("App.Models.Voucher", b =>

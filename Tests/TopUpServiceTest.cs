@@ -2,12 +2,14 @@
 using App.DTOs.Responses;
 using App.Helpers;
 using App.Models;
+using App.Models.Enums;
 using App.Repositories;
 using App.Services;
 using AutoMapper;
 using Moq;
 using System;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using Xunit;
 
 namespace Tests
@@ -16,8 +18,22 @@ namespace Tests
     {
         private Mock<IBankRepository>? mockBankRepo;
         private Bank? mockBank;
-        public Mock<IUserRepository>? mockUserRepo;
+        private Mock<IUserRepository>? mockUserRepo;
         private Mock<IBankTopUpRequestRepository>? mockBankRequestRepo;
+        private MapperConfiguration? mapperConfig;
+        private Mapper? mapper;
+        private TopUpService? topUpService;
+
+        private void Initialize()
+        {
+            mockBankRequestRepo = new Mock<IBankTopUpRequestRepository>();
+            mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperProfile());
+            });
+            mapper = new Mapper(mapperConfig);
+            topUpService = new TopUpService(mockBankRequestRepo.Object, mapper);
+        }
 
         [Fact]
         public async Task BankTopUp_ValidRequest_ReturnsSuccessAsync()
@@ -96,6 +112,23 @@ namespace Tests
                 repo => repo.Add(It.IsAny<BankTopUpRequest>()),
                 Times.Once
             );
+        }
+
+        [Fact]
+        public async void GetBankTopUpRequest_ValidData_ReturnSuccess()
+        {
+            // Arrange
+            Initialize();
+            RequestStatus? status = RequestStatus.Pending;
+            mockBankRequestRepo.Setup(r => r.GetAll(status)).ReturnsAsync(
+                new List<BankTopUpRequest> { new Mock<BankTopUpRequest>().Object });
+
+            // Act & Assert
+            List<GetBankTopUpRequestResponseDTO> resDTO = await topUpService.GetBankTopUpRequest(status);
+
+            // Assert
+            Assert.Single(resDTO);
+            mockBankRequestRepo.Verify(p => p.GetAll(status), Times.Once());
         }
     }
 }

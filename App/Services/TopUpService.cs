@@ -60,5 +60,34 @@ namespace App.Services
             topUpRequest.Status = RequestStatus.Pending;
             return topUpRequest;
         }
+
+        public TopUpService(IBankTopUpRequestRepository bankTopUpRequestRepository, IMapper mapper)
+        {
+            _bankRequestRepo = bankTopUpRequestRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<List<GetBankTopUpRequestResponseDTO>> GetBankTopUpRequest(RequestStatus? requestStatus)
+        {
+            IEnumerable<BankTopUpRequest> requests = await _bankRequestRepo.GetAll(requestStatus);
+            List<GetBankTopUpRequestResponseDTO> response = new List<GetBankTopUpRequestResponseDTO>();
+           
+            foreach (var request in requests)
+            {
+                GetBankTopUpRequestResponseDTO dto = new GetBankTopUpRequestResponseDTO()
+                {
+                    Id = request.Id,
+                    CreatedAt = request.CreatedAt.ToString("o"),
+                    UpdatedAt = request.UpdatedAt.ToString("o"),
+                    ExpiredDate = request.ExpiredDate.ToString("o"),
+                    Amount = request.Amount,
+                    Bank = _mapper.Map<GetBankTopUpRequestResponseDTO.BankDTO>(request.Bank),
+                    From = _mapper.Map<GetBankTopUpRequestResponseDTO.UserDTO>(request.From),
+                    Status = request.Status.ToString()
+                };
+                response.Add(dto);
+            }
+            return response;
+        }
     }
 }

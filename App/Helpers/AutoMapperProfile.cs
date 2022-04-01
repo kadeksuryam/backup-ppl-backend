@@ -25,6 +25,10 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.ExpiredDate, opt => opt.MapFrom(src =>
                         src.ExpiredDate.ToString("dd/MM/yyyy, HH:mm")));
+            CreateMap<User, GetBankTopUpRequestResponseDTO.UserDTO>();
+            CreateMap<Bank, GetBankTopUpRequestResponseDTO.BankDTO>();
+
+            CreateMap<Voucher, GetVoucherResponseDTO>();
         }
 
     }

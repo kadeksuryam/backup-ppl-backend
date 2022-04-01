@@ -1,4 +1,5 @@
 ﻿using App.Models;
+using App.Models.Enums;
 
 namespace App.Repositories
 {
@@ -6,5 +7,6 @@ namespace App.Repositories
     {
         Task<BankTopUpRequest> Add(BankTopUpRequest request);
         Task<IEnumerable<BankTopUpRequest>> GetAllPending();
+        Task<IEnumerable<BankTopUpRequest>> GetAll(RequestStatus? requestStatus);
     }
 }

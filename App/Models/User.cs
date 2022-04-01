@@ -8,6 +8,13 @@ namespace App.Models
             Standard,
             Google
         }
+
+        public enum UserRole
+        {
+            Customer,
+            Admin
+        }
+
         public uint Id { get; set; }
 
         public string UserName { get; set; } = string.Empty;
@@ -29,8 +36,11 @@ namespace App.Models
 
         public LoginType Type { get; set; }
 
+        public UserRole Role { get; set; }  
         public List<TopUpHistory>? TopUpHistories { get; set; }
         public List<BankTopUpRequest>? BankTopUpRequests { get; set; }
+        public List<TransactionHistory>? TransactionHistoriesFrom { get; set; }
 
+        public List<TransactionHistory>? TransactionHistoriesTo { get; set; }
     } 
 }
