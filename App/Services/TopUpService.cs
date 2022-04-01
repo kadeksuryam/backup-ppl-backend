@@ -23,6 +23,7 @@ namespace App.Services
             _bankRequestRepo = bankRequestRepo;
             _mapper = mapper;
         }
+
         public async Task<BankTopUpResponseDTO> BankTopUp(uint userId, BankTopUpRequestDTO requestDto)
         {
             SelectedBank = await _bankRepo.GetById(requestDto.BankId);
@@ -59,12 +60,6 @@ namespace App.Services
             topUpRequest.FromUserId = userId;
             topUpRequest.Status = RequestStatus.Pending;
             return topUpRequest;
-        }
-
-        public TopUpService(IBankTopUpRequestRepository bankTopUpRequestRepository, IMapper mapper)
-        {
-            _bankRequestRepo = bankTopUpRequestRepository;
-            _mapper = mapper;
         }
 
         public async Task<List<GetBankTopUpRequestResponseDTO>> GetBankTopUpRequest(RequestStatus? requestStatus)

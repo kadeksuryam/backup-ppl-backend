@@ -1,4 +1,4 @@
-﻿using App.DTOs.Requests;
+using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Helpers;
 using App.Models;
@@ -8,8 +8,8 @@ using App.Services;
 using AutoMapper;
 using Moq;
 using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Tests
@@ -18,7 +18,6 @@ namespace Tests
     {
         private Mock<IBankRepository>? mockBankRepo;
         private Bank? mockBank;
-        private Mock<IUserRepository>? mockUserRepo;
         private Mock<IBankTopUpRequestRepository>? mockBankRequestRepo;
         private MapperConfiguration? mapperConfig;
         private Mapper? mapper;
@@ -32,12 +31,15 @@ namespace Tests
                 cfg.AddProfile(new AutoMapperProfile());
             });
             mapper = new Mapper(mapperConfig);
-            topUpService = new TopUpService(mockBankRequestRepo.Object, mapper);
+            mockBankRepo = new();
+            topUpService = new TopUpService(mockBankRepo.Object,
+                mockBankRequestRepo.Object, mapper);
         }
 
         [Fact]
         public async Task BankTopUp_ValidRequest_ReturnsSuccessAsync()
         {
+            Initialize();
             uint userId = 1234;
             BankTopUpRequestDTO request = GetValidBankTopUpRequest();
             BankTopUpResponseDTO response = await MakeBankTopUp(userId, request);
@@ -59,35 +61,12 @@ namespace Tests
         {
             mockBank = new();
             mockBank.Id = request.BankId;
-
-            mockBankRepo = new();
-            mockBankRepo.Setup(repo => repo.GetById(request.BankId)).ReturnsAsync(mockBank);
+            mockBankRepo!.Setup(repo => repo.GetById(request.BankId)).ReturnsAsync(mockBank);
         }
 
         private async Task<BankTopUpResponseDTO> MakeBankTopUp(uint userId, BankTopUpRequestDTO request)
         {
-            return await GetTopUpService().BankTopUp(userId, request);
-        }
-
-        private TopUpService GetTopUpService()
-        {
-            Mapper mapper = CreateMapper();
-            mockBankRequestRepo = new();
-
-            return new TopUpService(
-                mockBankRepo!.Object,
-                mockBankRequestRepo.Object,
-                mapper
-            );
-        }
-
-        private static Mapper CreateMapper()
-        {
-            MapperConfiguration mapperConfig = new(config =>
-            {
-                config.AddProfile(new AutoMapperProfile());
-            });
-            return new Mapper(mapperConfig);
+            return await topUpService!.BankTopUp(userId, request);
         }
 
         private void AssertValidBankTopUpResponse(BankTopUpResponseDTO response)
@@ -120,11 +99,11 @@ namespace Tests
             // Arrange
             Initialize();
             RequestStatus? status = RequestStatus.Pending;
-            mockBankRequestRepo.Setup(r => r.GetAll(status)).ReturnsAsync(
+            mockBankRequestRepo!.Setup(r => r.GetAll(status)).ReturnsAsync(
                 new List<BankTopUpRequest> { new Mock<BankTopUpRequest>().Object });
 
             // Act & Assert
-            List<GetBankTopUpRequestResponseDTO> resDTO = await topUpService.GetBankTopUpRequest(status);
+            List<GetBankTopUpRequestResponseDTO> resDTO = await topUpService!.GetBankTopUpRequest(status);
 
             // Assert
             Assert.Single(resDTO);
