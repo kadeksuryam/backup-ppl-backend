@@ -18,7 +18,7 @@ namespace App.Models
         [ForeignKey("ToUserId")]
         public User? To { get; set; }
         public uint Amount { get; set; }
-        public TransactionStatus? Status { get; set; }
+        public TransactionStatus? Status { get; set; } = TransactionStatus.Success;
 
         public uint FromUserId { get; set; }
         public uint ToUserId { get; set; }

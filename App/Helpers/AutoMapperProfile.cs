@@ -24,6 +24,14 @@ namespace App.Helpers
             CreateMap<Bank, GetBankTopUpRequestResponseDTO.BankDTO>();
 
             CreateMap<Voucher, GetVoucherResponseDTO>();
+
+            CreateMap<CreateTransactionRequestDTO, TransactionHistory>();
+            CreateMap<TransactionHistory, CreateTransactionResponseDTO>();
+            CreateMap<User, CreateTransactionResponseDTO.UserDTO>()
+                .ForMember(dest =>
+                    dest.PreviousBalance, opt => opt.Ignore())
+                .ForMember(dest =>
+                    dest.CurrentBalance, opt => opt.Ignore());
         }
 
     }
