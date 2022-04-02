@@ -1,6 +1,7 @@
 ﻿using App.Models;
 using App.Models.Config;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace App.Data
 {
@@ -14,6 +15,8 @@ namespace App.Data
 
         public DbSet<BankTopUpRequest> BankTopUpRequests { get; set; }
 
+        public DbSet<TransactionHistory> TransactionHistories { get; set; }
+
         public DbSet<Bank> Banks { get; set; }
 
         public DbSet<Voucher> Vouchers { get; set; }
@@ -24,6 +27,11 @@ namespace App.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
+        }
+
+        public IDbContextTransaction BeginTransaction()
+        {
+            return this.Database.BeginTransaction();
         }
 
         #region Required
