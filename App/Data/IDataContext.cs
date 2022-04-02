@@ -1,5 +1,6 @@
 ﻿using App.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace App.Data
 {
@@ -12,6 +13,7 @@ namespace App.Data
         DbSet<TransactionHistory> TransactionHistories { get; set; }
         DbSet<Bank> Banks { get; set; }
         DbSet<Voucher> Vouchers { get; set; }
+        IDbContextTransaction BeginTransaction();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using App.Models;
 using App.Models.Config;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace App.Data
 {
@@ -26,6 +27,11 @@ namespace App.Data
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableSensitiveDataLogging();
+        }
+
+        public IDbContextTransaction BeginTransaction()
+        {
+            return this.Database.BeginTransaction();
         }
 
         #region Required
