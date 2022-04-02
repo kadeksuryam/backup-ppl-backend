@@ -66,7 +66,7 @@ namespace App.Services
         {
             IEnumerable<BankTopUpRequest> requests = await _bankRequestRepo.GetAll(requestStatus);
             List<GetBankTopUpRequestResponseDTO> response = new List<GetBankTopUpRequestResponseDTO>();
-           
+
             foreach (var request in requests)
             {
                 GetBankTopUpRequestResponseDTO dto = new GetBankTopUpRequestResponseDTO()
@@ -83,6 +83,11 @@ namespace App.Services
                 response.Add(dto);
             }
             return response;
+        }
+
+        public Task<VoucherTopUpResponseDTO> VoucherTopUp(uint userId, VoucherTopUpRequestDTO request)
+        {
+            throw new NotImplementedException();
         }
     }
 }

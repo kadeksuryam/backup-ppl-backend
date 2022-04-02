@@ -19,9 +19,13 @@ namespace Tests
         private Mock<IBankRepository>? mockBankRepo;
         private Bank? mockBank;
         private Mock<IBankTopUpRequestRepository>? mockBankRequestRepo;
+        private Mock<IVoucherRepository>? mockVoucherRepo;
+        private Mock<IUserRepository>? mockUserRepo;
+        private Mock<ITopUpHistoryRepository>? mockHistoryRepo;
         private MapperConfiguration? mapperConfig;
         private Mapper? mapper;
         private TopUpService? topUpService;
+        private Voucher? mockVoucher;
 
         private void Initialize()
         {
@@ -32,12 +36,16 @@ namespace Tests
             });
             mapper = new Mapper(mapperConfig);
             mockBankRepo = new();
+            mockVoucherRepo = new();
+            mockUserRepo = new();
+            mockHistoryRepo = new();
+
             topUpService = new TopUpService(mockBankRepo.Object,
                 mockBankRequestRepo.Object, mapper);
         }
 
         [Fact]
-        public async Task BankTopUp_ValidRequest_ReturnsSuccessAsync()
+        public async void BankTopUp_ValidRequest_ReturnsSuccessAsync()
         {
             Initialize();
             uint userId = 1234;
@@ -53,11 +61,11 @@ namespace Tests
             request.Amount = 50000;
             request.BankId = 6789;
 
-            MakeRequestValid(request);
+            MakeBankRequestValid(request);
             return request;
         }
 
-        private void MakeRequestValid(BankTopUpRequestDTO request)
+        private void MakeBankRequestValid(BankTopUpRequestDTO request)
         {
             mockBank = new();
             mockBank.Id = request.BankId;
@@ -108,6 +116,73 @@ namespace Tests
             // Assert
             Assert.Single(resDTO);
             mockBankRequestRepo.Verify(p => p.GetAll(status), Times.Once());
+        }
+
+        [Fact]
+        public async void VoucherTopUp_ValidData_ReturnsSuccess()
+        {
+            Initialize();
+            uint userId = 1234;
+            VoucherTopUpRequestDTO request = GetValidVoucherTopUpRequest();
+            VoucherTopUpResponseDTO response = await MakeVoucherTopUp(userId, request);
+
+            AssertValidVoucherTopUpResponse(response);
+            AssertExactlyOneVoucherUpdate(request);
+            AssertExactlyOneUserUpdate();
+            AssertExactlyOneTopUpHistoryAdded();
+        }
+
+        private VoucherTopUpRequestDTO GetValidVoucherTopUpRequest()
+        {
+            VoucherTopUpRequestDTO request = new();
+            request.VoucherCode = "FREEMONEY";
+
+            MakeVoucherRequestValid(request);
+            return request;
+        }
+
+        private void MakeVoucherRequestValid(VoucherTopUpRequestDTO request)
+        {
+            mockVoucher = new();
+            mockVoucher.Code = request.VoucherCode;
+            mockVoucher.Amount = 25000;
+            mockVoucher.IsUsed = false;
+
+            mockVoucherRepo!.Setup(repo => repo.GetByCode(request.VoucherCode)).ReturnsAsync(mockVoucher);
+        }
+
+        private async Task<VoucherTopUpResponseDTO> MakeVoucherTopUp(uint userId, VoucherTopUpRequestDTO request)
+        {
+            return await topUpService!.VoucherTopUp(userId, request);
+        }
+
+        private void AssertValidVoucherTopUpResponse(VoucherTopUpResponseDTO response)
+        {
+            Assert.Equal(mockVoucher!.Amount, response.Amount);
+        }
+
+        private void AssertExactlyOneVoucherUpdate(VoucherTopUpRequestDTO request)
+        {
+            mockVoucherRepo!.Verify(
+                repo => repo.Update(It.IsAny<Voucher>()),
+                Times.Once
+            );
+        }
+
+        private void AssertExactlyOneUserUpdate()
+        {
+            mockUserRepo!.Verify(
+                repo => repo.Update(It.IsAny<User>()),
+                Times.Once
+            );
+        }
+
+        private void AssertExactlyOneTopUpHistoryAdded()
+        {
+            mockHistoryRepo!.Verify(
+                repo => repo.Add(It.IsAny<TopUpHistory>()),
+                Times.Once
+            );
         }
     }
 }
