@@ -29,13 +29,11 @@ namespace App.Repositories
         public async Task<TransactionHistory?> Delete(int id)
         {
             var entity = await _context.TransactionHistories.FindAsync(id);
-            if (entity == null)
+            if (entity != null)
             {
-                return entity;
+                _context.TransactionHistories.Remove(entity);
+                await _context.SaveChangesAsync();
             }
-
-            _context.TransactionHistories.Remove(entity);
-            await _context.SaveChangesAsync();
 
             return entity;
         }
