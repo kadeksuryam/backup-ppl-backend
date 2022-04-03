@@ -25,7 +25,9 @@ namespace Tests
         private MapperConfiguration? mapperConfig;
         private Mapper? mapper;
         private TopUpService? topUpService;
+        private VoucherService? voucherService;
         private Voucher? mockVoucher;
+        private User? mockUser;
 
         private void Initialize()
         {
@@ -40,15 +42,32 @@ namespace Tests
             mockUserRepo = new();
             mockHistoryRepo = new();
 
+            voucherService = new VoucherService(mockVoucherRepo.Object, mapper);
             topUpService = new TopUpService(mockBankRepo.Object,
-                mockBankRequestRepo.Object, mapper);
+                mockBankRequestRepo.Object, mockVoucherRepo.Object,
+                mockUserRepo.Object, mockHistoryRepo.Object,
+                voucherService, mapper);
+        }
+        private uint GetAuthenticatedUserId()
+        {
+            uint userId = 1234;
+            MakeUserIdAuthenticated(userId);
+            return userId;
+        }
+
+        private void MakeUserIdAuthenticated(uint userId)
+        {
+            mockUser = new();
+            mockUser.Id = userId;
+            mockUser.Balance = 0;
+            mockUserRepo!.Setup(repo => repo.GetById(userId)).ReturnsAsync(mockUser);
         }
 
         [Fact]
         public async void BankTopUp_ValidRequest_ReturnsSuccessAsync()
         {
             Initialize();
-            uint userId = 1234;
+            uint userId = GetAuthenticatedUserId();
             BankTopUpRequestDTO request = GetValidBankTopUpRequest();
             BankTopUpResponseDTO response = await MakeBankTopUp(userId, request);
             AssertValidBankTopUpResponse(response);
@@ -122,7 +141,7 @@ namespace Tests
         public async void VoucherTopUp_ValidData_ReturnsSuccess()
         {
             Initialize();
-            uint userId = 1234;
+            uint userId = GetAuthenticatedUserId();
             VoucherTopUpRequestDTO request = GetValidVoucherTopUpRequest();
             VoucherTopUpResponseDTO response = await MakeVoucherTopUp(userId, request);
 
