@@ -19,13 +19,12 @@ namespace Tests
         private Mock<IBankRepository>? mockBankRepo;
         private Bank? mockBank;
         private Mock<IBankTopUpRequestRepository>? mockBankRequestRepo;
-        private Mock<IVoucherRepository>? mockVoucherRepo;
         private Mock<IUserRepository>? mockUserRepo;
         private Mock<ITopUpHistoryRepository>? mockHistoryRepo;
+        private Mock<IVoucherService>? mockVoucherService;
         private MapperConfiguration? mapperConfig;
         private Mapper? mapper;
         private TopUpService? topUpService;
-        private VoucherService? voucherService;
         private Voucher? mockVoucher;
         private User? mockUser;
 
@@ -38,15 +37,14 @@ namespace Tests
             });
             mapper = new Mapper(mapperConfig);
             mockBankRepo = new();
-            mockVoucherRepo = new();
             mockUserRepo = new();
             mockHistoryRepo = new();
+            mockVoucherService = new Mock<IVoucherService>();
 
-            voucherService = new VoucherService(mockVoucherRepo.Object, mapper);
             topUpService = new TopUpService(mockBankRepo.Object,
-                mockBankRequestRepo.Object, mockVoucherRepo.Object,
+                mockBankRequestRepo.Object,
                 mockUserRepo.Object, mockHistoryRepo.Object,
-                voucherService, mapper);
+                mockVoucherService.Object, mapper);
         }
         private uint GetAuthenticatedUserId()
         {
@@ -146,7 +144,7 @@ namespace Tests
             VoucherTopUpResponseDTO response = await MakeVoucherTopUp(userId, request);
 
             AssertValidVoucherTopUpResponse(response);
-            AssertExactlyOneVoucherUpdate(request);
+            AssertExactlyOneVoucherUsage();
             AssertExactlyOneUserUpdate();
             AssertExactlyOneTopUpHistoryAdded();
         }
@@ -167,7 +165,13 @@ namespace Tests
             mockVoucher.Amount = 25000;
             mockVoucher.IsUsed = false;
 
-            mockVoucherRepo!.Setup(repo => repo.GetByCode(request.VoucherCode)).ReturnsAsync(mockVoucher);
+            mockVoucherService!.Setup(service => service.UseVoucher(mockVoucher.Code))
+                .ReturnsAsync(MarkAsUsedAndGetMockVoucher);
+        }
+        private Voucher MarkAsUsedAndGetMockVoucher()
+        {
+            mockVoucher!.IsUsed = true;
+            return mockVoucher;
         }
 
         private async Task<VoucherTopUpResponseDTO> MakeVoucherTopUp(uint userId, VoucherTopUpRequestDTO request)
@@ -180,10 +184,10 @@ namespace Tests
             Assert.Equal(mockVoucher!.Amount, response.Amount);
         }
 
-        private void AssertExactlyOneVoucherUpdate(VoucherTopUpRequestDTO request)
+        private void AssertExactlyOneVoucherUsage()
         {
-            mockVoucherRepo!.Verify(
-                repo => repo.Update(It.IsAny<Voucher>()),
+            mockVoucherService!.Verify(
+                repo => repo.UseVoucher(It.IsAny<string>()),
                 Times.Once
             );
         }

@@ -13,7 +13,6 @@ namespace App.Services
     {
         private readonly IBankRepository _bankRepo;
         private readonly IBankTopUpRequestRepository _bankRequestRepo;
-        private readonly IVoucherRepository _voucherRepo;
         private readonly IUserRepository _userRepo;
         private readonly ITopUpHistoryRepository _historyRepo;
         private readonly IVoucherService _voucherService;
@@ -22,12 +21,11 @@ namespace App.Services
         private Bank? SelectedBank;
 
         public TopUpService(IBankRepository bankRepo, IBankTopUpRequestRepository bankRequestRepo,
-            IVoucherRepository voucherRepo, IUserRepository userRepo, ITopUpHistoryRepository historyRepo,
+            IUserRepository userRepo, ITopUpHistoryRepository historyRepo,
             IVoucherService voucherService, IMapper mapper)
         {
             _bankRepo = bankRepo;
             _bankRequestRepo = bankRequestRepo;
-            _voucherRepo = voucherRepo;
             _userRepo = userRepo;
             _historyRepo = historyRepo;
             _voucherService = voucherService;
@@ -97,59 +95,9 @@ namespace App.Services
 
         public async Task<VoucherTopUpResponseDTO> VoucherTopUp(uint userId, VoucherTopUpRequestDTO request)
         {
-            /*
-            Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode); // Karena tergunakan, jaga integritasnya
+            Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode);
 
             DateTime now = DateTime.Now;
-
-            User user = await _userRepo.GetById(userId);
-            user.Balance = voucher.Amount;
-
-            TopUpHistory history = new()
-            {
-                Amount = (int)voucher.Amount,
-                CreatedAt = now,
-                UpdatedAt = now,
-                FromUserId = userId,
-                Method = TopUpHistory.TopUpMethod.Voucher,
-                //VoucherId = voucher.Id,
-            };
-
-            VoucherTopUpResponseDTO response = new()
-            {
-                Amount = voucher.Amount
-            };
-
-            // Watch out false rollback!
-            await _historyRepo.Add(history);
-            await _userRepo.Update(user);
-            // Need to handle if fail
-            */
-
-            // Copy from VoucherService because it can not be used directly
-            Voucher? voucher = await _voucherRepo.GetByCode(request.VoucherCode);
-
-            if (voucher == null)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.NotFound, "Voucher not found");
-            }
-            else if (voucher.IsUsed)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "This voucher has been used before");
-            }
-            else
-            {
-                return await ExecuteVoucherTopUp(userId, voucher);
-                throw new NotImplementedException();
-            }
-        }
-
-        private async Task<VoucherTopUpResponseDTO> ExecuteVoucherTopUp(uint userId, Voucher voucher)
-        {
-            DateTime now = DateTime.Now;
-
-            voucher.IsUsed = true;
-            voucher.UpdatedAt = now;
 
             User user = await _userRepo.GetById(userId);
             user.Balance += voucher.Amount;
@@ -169,9 +117,7 @@ namespace App.Services
                 Amount = voucher.Amount
             };
 
-            // Watch out false rollback!
             await _historyRepo.Add(history);
-            await _voucherRepo.Update(voucher);
             await _userRepo.Update(user);
 
             return response;
