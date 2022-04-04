@@ -25,6 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<IBankRepository, BankRepository>();
     services.AddScoped<IBankTopUpRequestRepository, BankTopUpRequestRepository>();
     services.AddScoped<IVoucherRepository, VoucherRepository>();
+    services.AddScoped<ITopUpHistoryRepository, TopUpHistoryRepository>();
     services.AddScoped<IVoucherService, VoucherService>();
     services.AddScoped<ITopUpService, TopUpService>();
     services.AddScoped<IUserService, UserService>();
