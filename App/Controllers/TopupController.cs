@@ -38,7 +38,7 @@ namespace App.Controllers
         }
 
         [Authorize(Role = "Customer")]
-        [HttpPost("/users/{userId}/bank/make-request")]
+        [HttpPost("users/{userId}/bank/make-request")]
         public async Task<IActionResult> BankTopUp(uint userId, [FromBody] BankTopUpRequestDTO reqDTO)
         {
             uint? currUserId = (uint?)HttpContext.Items["userId"];
