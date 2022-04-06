@@ -97,25 +97,13 @@ namespace App.Services
         {
             Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode);
 
-            DateTime now = DateTime.Now;
-
             User user = await _userRepo.GetById(userId);
             user.Balance += voucher.Amount;
 
-            TopUpHistory history = new()
-            {
-                Amount = (int)voucher.Amount,
-                CreatedAt = now,
-                UpdatedAt = now,
-                FromUserId = userId,
-                Method = TopUpHistory.TopUpMethod.Voucher,
-                VoucherId = voucher.Id,
-            };
+            TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
+            history.FromUserId = userId;
 
-            VoucherTopUpResponseDTO response = new()
-            {
-                Amount = voucher.Amount
-            };
+            VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
 
             await _historyRepo.Add(history);
             await _userRepo.Update(user);

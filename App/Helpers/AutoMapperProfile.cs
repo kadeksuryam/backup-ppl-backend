@@ -30,6 +30,28 @@ namespace App.Helpers
             CreateMap<Bank, GetBankTopUpRequestResponseDTO.BankDTO>();
 
             CreateMap<Voucher, GetVoucherResponseDTO>();
+
+            CreateMap<Voucher, VoucherTopUpResponseDTO>();
+            CreateMap<Voucher, TopUpHistory>()
+                .ForMember(dest =>
+                    dest.CreatedAt, opt => opt.MapFrom(src => src.UpdatedAt))
+                .ForMember(dest =>
+                    dest.Method, opt => opt.Equals(TopUpHistory.TopUpMethod.Voucher))
+                .ForMember(dest =>
+                    dest.VoucherId,
+                    opt => opt.MapFrom(src => src.Id));
+
+            /*
+            TopUpHistory history = new()
+            {
+                Amount = (int)voucher.Amount,
+                CreatedAt = now,
+                UpdatedAt = now,
+                FromUserId = userId,
+                Method = TopUpHistory.TopUpMethod.Voucher,
+                VoucherId = voucher.Id,
+            };
+            */
         }
     }
 }
