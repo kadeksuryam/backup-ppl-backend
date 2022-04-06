@@ -1,14 +1,14 @@
 ﻿using App.Helpers.FormatValidator;
-using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace App.DTOs.Requests
 {
     public class BankTopUpRequestDTO
     {
-        [Required]
+        [JsonPropertyName("amount")]
         [Amount]
         public int Amount { get; set; }
-        [Required]
+        [JsonPropertyName("bank_id")]
         public uint BankId { get; set; }
     }
 }
