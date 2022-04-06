@@ -12,11 +12,11 @@ namespace App.Controllers
 {
     [ApiController]
     [Route("topup")]
-    public class TopupController : ControllerBase
+    public class TopUpController : ControllerBase
     {
         private readonly ITopUpService _topUpService;
 
-        public TopupController(ITopUpService topUpService)
+        public TopUpController(ITopUpService topUpService)
         {
             _topUpService = topUpService;
         }
