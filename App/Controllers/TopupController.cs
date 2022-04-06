@@ -53,5 +53,22 @@ namespace App.Controllers
                 return Ok(resDTO);
             }
         }
+
+        [Authorize(Role = "Customer")]
+        [HttpPost("users/{userId}/voucher/use")]
+        public async Task<IActionResult> VoucherTopUp(uint userId, [FromBody] VoucherTopUpRequestDTO reqDTO)
+        {
+            uint? currUserId = (uint?)HttpContext.Items["userId"];
+
+            if (currUserId != userId)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
+            }
+            else
+            {
+                VoucherTopUpResponseDTO resDTO = await _topUpService.VoucherTopUp(userId, reqDTO);
+                return Ok(resDTO);
+            }
+        }
     }
 }
