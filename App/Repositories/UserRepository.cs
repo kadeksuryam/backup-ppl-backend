@@ -33,9 +33,9 @@ namespace App.Repositories
             return entity;
         }
 
-        public async Task<User> GetById(uint id)
+        public async Task<User?> GetById(uint id)
         {
-            return await _context.Users.Where(b => b.Id == id).FirstAsync();
+            return await _context.Users.Where(b => b.Id == id).FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<User>> GetAll()

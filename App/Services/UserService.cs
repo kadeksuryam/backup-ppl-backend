@@ -78,7 +78,8 @@
 
         public async Task UpdateProfile(uint userId, UpdateProfileRequestDTO dto)
         {
-            User userDb = await _userRepository.GetById(userId);
+            User? userDb = await _userRepository.GetById(userId);
+            if (userDb == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, "User not found");
 
             if(HasGoogleLoginType(userDb))
             {
@@ -106,7 +107,8 @@
 
         public async Task<GetProfileResponseDTO> GetProfile(uint userId)
         {
-            User userDb = await _userRepository.GetById(userId);
+            User? userDb = await _userRepository.GetById(userId);
+            if (userDb == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, "User not found");
 
             var response = _mapper.Map<GetProfileResponseDTO>(userDb);
             response.Level = (await _levelRepository.GetById(userDb.LevelId)).Name;

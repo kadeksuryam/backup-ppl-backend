@@ -31,6 +31,14 @@ namespace App.Helpers
 
             CreateMap<Voucher, GetVoucherResponseDTO>();
 
+            CreateMap<CreateTransactionRequestDTO, TransactionHistory>();
+            CreateMap<TransactionHistory, CreateTransactionResponseDTO>();
+            CreateMap<User, CreateTransactionResponseDTO.UserDTO>()
+                .ForMember(dest =>
+                    dest.PreviousBalance, opt => opt.Ignore())
+                .ForMember(dest =>
+                    dest.CurrentBalance, opt => opt.Ignore());
+
             CreateMap<Voucher, VoucherTopUpResponseDTO>();
             CreateMap<Voucher, TopUpHistory>()
                 .ForMember(dest =>
@@ -40,18 +48,6 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.VoucherId,
                     opt => opt.MapFrom(src => src.Id));
-
-            /*
-            TopUpHistory history = new()
-            {
-                Amount = (int)voucher.Amount,
-                CreatedAt = now,
-                UpdatedAt = now,
-                FromUserId = userId,
-                Method = TopUpHistory.TopUpMethod.Voucher,
-                VoucherId = voucher.Id,
-            };
-            */
         }
     }
 }
