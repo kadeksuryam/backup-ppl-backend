@@ -97,8 +97,8 @@ namespace App.Services
         {
             Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode);
 
-            User user = await _userRepo.GetById(userId);
-            user.Balance += voucher.Amount;
+            User? user = await _userRepo.GetById(userId);
+            user!.Balance += voucher.Amount;
 
             TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
             history.FromUserId = userId;
