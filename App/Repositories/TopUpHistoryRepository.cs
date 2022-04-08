@@ -1,5 +1,6 @@
 ﻿using App.Data;
 using App.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace App.Repositories
 {
@@ -16,6 +17,13 @@ namespace App.Repositories
             _context.TopUpHistories.Add(entity);
             await _context.SaveChangesAsync();
             return entity;
+        }
+
+        public async Task<IEnumerable<TopUpHistory>> GetAllByUserId(uint userId)
+        {
+            return await _context.TopUpHistories
+                .Where(history => history.FromUserId == userId)
+                .ToListAsync();
         }
     }
 }
