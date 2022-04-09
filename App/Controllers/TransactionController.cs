@@ -1,12 +1,10 @@
 ﻿using App.Authorization;
 using App.DTOs.Requests;
 using App.DTOs.Responses;
-using App.Services;
-using App.Repositories;
-using Microsoft.AspNetCore.Mvc;
 using App.Helpers;
+using App.Services;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Reflection;
 
 namespace App.Controllers
 {
@@ -36,6 +34,23 @@ namespace App.Controllers
 
             var response = await _transactionService.CreateTransaction(dto);
             return Ok(response);
+        }
+
+        [Authorize(Role = "Customer")]
+        [HttpGet("users/{userId}")]
+        public async Task<IActionResult> GetTopUpHistoriesByUser(uint userId)
+        {
+            VerifyUserId(userId);
+            List<TransactionHistoryResponseDTO> resDTO = await _transactionService.GetTransactionHistoriesByUser(userId);
+            return Ok(resDTO);
+        }
+        private void VerifyUserId(uint userId)
+        {
+            uint? currUserId = (uint?)HttpContext.Items["userId"];
+            if (currUserId != userId)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
+            }
         }
     }
 }
