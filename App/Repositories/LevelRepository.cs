@@ -21,5 +21,13 @@ namespace App.Repositories
         {
             return await _context.Levels.ToListAsync();
         }
+
+        public async Task<Level?> GetByExp(uint exp)
+        {
+            return await _context.Levels
+                .Where(b => b.RequiredExp <= exp)
+                .OrderByDescending(b => b.RequiredExp)
+                .FirstOrDefaultAsync();
+        }
     }
 }

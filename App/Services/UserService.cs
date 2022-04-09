@@ -1,25 +1,29 @@
 ﻿namespace App.Services
 {
     using App.Authorization;
+    using App.Data;
     using App.DTOs.Requests;
     using App.DTOs.Responses;
     using App.Helpers;
     using App.Models;
     using App.Repositories;
     using AutoMapper;
+    using Microsoft.EntityFrameworkCore.Storage;
     using System.Net;
 
     public class UserService : IUserService
     {
+        private readonly IDataContext _context;
         private readonly IUserRepository _userRepository;
         private readonly ILevelRepository _levelRepository;
         private readonly IMapper _mapper;
         private readonly IJwtUtils _jwtUtils;
         private readonly IBcryptWrapper _bcryptWrapper;
-        public UserService(IUserRepository userRepository, ILevelRepository levelRepository,
-            IMapper mapper,
+        public UserService(IDataContext context, IUserRepository userRepository, 
+            ILevelRepository levelRepository, IMapper mapper,
             IJwtUtils jwtUtils, IBcryptWrapper bcryptWrapper)
         {
+            _context = context;
             _userRepository = userRepository;
             _levelRepository = levelRepository;
             _mapper = mapper;
@@ -130,6 +134,22 @@
         {
             return user.Type == User.LoginType.Google;
         }
-    }
 
+        public async Task AddExp(User entity, uint exp)
+        {
+            entity.Exp = entity.Exp + exp;
+
+            Level? level = await _levelRepository.GetByExp(entity.Exp);
+            if (level == null)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, "An error occured");
+            }
+
+            if (level!.Id != entity.LevelId)
+            {
+                entity.LevelId = level.Id;
+            }
+            await _userRepository.Update(entity);
+        }
+    }
 }

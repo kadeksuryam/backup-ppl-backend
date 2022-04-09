@@ -6,5 +6,6 @@ namespace App.Repositories
     {
         Task<IEnumerable<Level>> GetAll();
         Task<Level> GetById(uint id);
+        Task<Level?> GetByExp(uint exp);
     }
 }
