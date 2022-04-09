@@ -7,6 +7,8 @@ namespace App.Helpers
 {
     public class AutoMapperProfile : Profile
     {
+        const string DateFormat = "dd/MM/yyyy, HH:mm";
+
         public AutoMapperProfile()
         {
             CreateMap<RegisterRequestDTO, User>()
@@ -24,7 +26,7 @@ namespace App.Helpers
             CreateMap<BankTopUpRequest, BankTopUpResponseDTO>()
                 .ForMember(dest =>
                     dest.ExpiredDate, opt => opt.MapFrom(src =>
-                        src.ExpiredDate.ToString("dd/MM/yyyy, HH:mm")));
+                        src.ExpiredDate.ToString(DateFormat)));
 
             CreateMap<User, GetBankTopUpRequestResponseDTO.UserDTO>();
             CreateMap<Bank, GetBankTopUpRequestResponseDTO.BankDTO>();
@@ -50,7 +52,27 @@ namespace App.Helpers
                     opt => opt.MapFrom(src => src.Id));
 
 
-            CreateMap<TopUpHistory, TopUpHistoryResponseDTO>();
+            CreateMap<TopUpHistory, TopUpHistoryResponseDTO>()
+                .ForMember(dest =>
+                    dest.CreatedAt, opt => opt.MapFrom(src =>
+                        src.CreatedAt.ToString(DateFormat)))
+                .ForMember(dest =>
+                    dest.UpdatedAt, opt => opt.MapFrom(src =>
+                        src.UpdatedAt.ToString(DateFormat)))
+                .ForMember(dest =>
+                    dest.Method, opt => opt.MapFrom(src =>
+                        src.Method.ToString()));
+
+            CreateMap<TransactionHistory, TransactionHistoryResponseDTO>()
+                .ForMember(dest =>
+                    dest.CreatedAt, opt => opt.MapFrom(src =>
+                        src.CreatedAt.ToString(DateFormat)))
+                .ForMember(dest =>
+                    dest.UpdatedAt, opt => opt.MapFrom(src =>
+                        src.UpdatedAt.ToString(DateFormat)))
+                .ForMember(dest =>
+                    dest.Status, opt => opt.MapFrom(src =>
+                        src.Status.ToString()));
         }
     }
 }
