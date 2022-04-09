@@ -187,17 +187,17 @@ namespace App.Migrations
                 columns: new[] { "id", "name", "required_exp" },
                 values: new object[,]
                 {
-                    { 2L, "Silver", 100L },
+                    { 2L, "Silver", 50L },
                     { 3L, "Gold", 200L },
-                    { 4L, "Platinum", 300L },
-                    { 5L, "Diamond", 400L },
-                    { 6L, "Crazy Rich", 500L }
+                    { 4L, "Platinum", 1000L },
+                    { 5L, "Diamond", 10000L },
+                    { 6L, "Crazy Rich", 45000L }
                 });
 
             migrationBuilder.InsertData(
                 table: "users",
                 columns: new[] { "id", "display_name", "email", "encrypted_password", "levelId", "user_role", "username" },
-                values: new object[] { 1L, "Admin", "admin@cakrawala.id", "$2a$11$8q8wtz/18sC0Ih2cgejiV.SoqP8SbHNOhM8RxqkE0exo0iyQ6/eNK", 1L, "Admin", "cakrawalaid" });
+                values: new object[] { 1L, "Admin", "admin@cakrawala.id", "$2a$11$clsMuabPvX45JvDhbuMDhuK3pKhXU8kofFs3tRKI.jVsOjvSnSQLi", 1L, "Admin", "cakrawalaid" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_bank_topup_request_bank_id",

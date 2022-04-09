@@ -137,7 +137,7 @@ namespace App.Migrations
                         {
                             Id = 2L,
                             Name = "Silver",
-                            RequiredExp = 100L
+                            RequiredExp = 50L
                         },
                         new
                         {
@@ -149,19 +149,19 @@ namespace App.Migrations
                         {
                             Id = 4L,
                             Name = "Platinum",
-                            RequiredExp = 300L
+                            RequiredExp = 1000L
                         },
                         new
                         {
                             Id = 5L,
                             Name = "Diamond",
-                            RequiredExp = 400L
+                            RequiredExp = 10000L
                         },
                         new
                         {
                             Id = 6L,
                             Name = "Crazy Rich",
-                            RequiredExp = 500L
+                            RequiredExp = 45000L
                         });
                 });
 
@@ -350,7 +350,7 @@ namespace App.Migrations
                             Balance = 0L,
                             DisplayName = "Admin",
                             Email = "admin@cakrawala.id",
-                            EncryptedPassword = "$2a$11$8q8wtz/18sC0Ih2cgejiV.SoqP8SbHNOhM8RxqkE0exo0iyQ6/eNK",
+                            EncryptedPassword = "$2a$11$clsMuabPvX45JvDhbuMDhuK3pKhXU8kofFs3tRKI.jVsOjvSnSQLi",
                             Exp = 0L,
                             LevelId = 1L,
                             Role = "Admin",
