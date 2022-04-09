@@ -110,5 +110,19 @@ namespace App.Services
 
             return response;
         }
+
+        public async Task<List<TopUpHistoryResponseDTO>> GetTopUpHistoriesByUser(uint userId)
+        {
+            IEnumerable<TopUpHistory> histories = await _historyRepo.GetAllByUserId(userId);
+            histories = histories.OrderByDescending(history => history.UpdatedAt);
+
+            List<TopUpHistoryResponseDTO> responses = new();
+            foreach (TopUpHistory history in histories)
+            {
+                responses.Add(_mapper.Map<TopUpHistoryResponseDTO>(history));
+            }
+
+            return responses;
+        }
     }
 }

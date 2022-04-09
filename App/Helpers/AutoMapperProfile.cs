@@ -48,6 +48,9 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.VoucherId,
                     opt => opt.MapFrom(src => src.Id));
+
+
+            CreateMap<TopUpHistory, TopUpHistoryResponseDTO>();
         }
     }
 }

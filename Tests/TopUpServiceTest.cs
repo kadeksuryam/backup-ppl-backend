@@ -27,6 +27,7 @@ namespace Tests
         private TopUpService? topUpService;
         private Voucher? mockVoucher;
         private User? mockUser;
+        private List<TopUpHistory> mockHistories = new();
 
         private void Initialize()
         {
@@ -206,6 +207,59 @@ namespace Tests
                 repo => repo.Add(It.IsAny<TopUpHistory>()),
                 Times.Once
             );
+        }
+
+        [Fact]
+        public async void GetTopUpHistoriesByUser_ValidData_ReturnSuccess()
+        {
+            Initialize();
+            uint userId = GetAuthenticatedUserId();
+            MakeMockTopUpHistoriesByUserId(userId);
+            List<TopUpHistoryResponseDTO> response = await topUpService!.GetTopUpHistoriesByUser(userId);
+            AssertTopUpHistoriesResponseSortedByTime(response);
+        }
+
+        private void MakeMockTopUpHistoriesByUserId(uint userId)
+        {
+            mockHistories = new();
+            mockHistories.Add(new TopUpHistory() {
+                UpdatedAt = DateTime.Now,
+                Method = TopUpHistory.TopUpMethod.Bank
+            });
+            mockHistories.Add(new TopUpHistory()
+            {
+                UpdatedAt = DateTime.Now.AddHours(2),
+                Method = TopUpHistory.TopUpMethod.Voucher
+            });
+            mockHistories.Add(new TopUpHistory()
+            {
+                UpdatedAt = DateTime.Now.AddHours(1),
+                Method = TopUpHistory.TopUpMethod.Voucher
+            });
+
+            mockHistoryRepo!.Setup(repo => repo.GetAllByUserId(userId)).ReturnsAsync(mockHistories);
+        }
+
+        private void AssertTopUpHistoriesResponseSortedByTime(List<TopUpHistoryResponseDTO> response)
+        {
+            // Later first
+            Assert.True(DateTime.TryParse(
+                response[0].UpdatedAt,
+                out DateTime firstUpdateTime
+            ));
+
+            int responseIndex = 1;
+            while (responseIndex < mockHistories.Count)
+            {
+                Assert.True(DateTime.TryParse(
+                    response[responseIndex].UpdatedAt,
+                    out DateTime secondUpdateTime
+                ));
+                Assert.True(DateTime.Compare(firstUpdateTime, secondUpdateTime) > 0);
+
+                firstUpdateTime = secondUpdateTime;
+                responseIndex++;
+            }
         }
     }
 }

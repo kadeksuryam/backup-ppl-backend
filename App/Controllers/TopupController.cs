@@ -37,38 +37,41 @@ namespace App.Controllers
             });
         }
 
-        [Authorize(Role = "Customer")]
-        [HttpPost("users/{userId}/bank/make-request")]
-        public async Task<IActionResult> BankTopUp(uint userId, [FromBody] BankTopUpRequestDTO reqDTO)
+        private void VerifyUserId(uint userId)
         {
             uint? currUserId = (uint?)HttpContext.Items["userId"];
-
             if (currUserId != userId)
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
-            }
-            else
-            {
-                BankTopUpResponseDTO resDTO = await _topUpService.BankTopUp(userId, reqDTO);
-                return Ok(resDTO);
             }
         }
 
         [Authorize(Role = "Customer")]
+        [HttpPost("users/{userId}/bank/make-request")]
+        public async Task<IActionResult> BankTopUp(uint userId, [FromBody] BankTopUpRequestDTO reqDTO)
+        {
+            VerifyUserId(userId);
+            BankTopUpResponseDTO resDTO = await _topUpService.BankTopUp(userId, reqDTO);
+            return Ok(resDTO);
+        }
+
+        
+        [Authorize(Role = "Customer")]
         [HttpPost("users/{userId}/voucher/use")]
         public async Task<IActionResult> VoucherTopUp(uint userId, [FromBody] VoucherTopUpRequestDTO reqDTO)
         {
-            uint? currUserId = (uint?)HttpContext.Items["userId"];
+            VerifyUserId(userId);
+            VoucherTopUpResponseDTO resDTO = await _topUpService.VoucherTopUp(userId, reqDTO);
+            return Ok(resDTO);
+        }
 
-            if (currUserId != userId)
-            {
-                throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
-            }
-            else
-            {
-                VoucherTopUpResponseDTO resDTO = await _topUpService.VoucherTopUp(userId, reqDTO);
-                return Ok(resDTO);
-            }
+        [Authorize(Role = "Customer")]
+        [HttpGet("users/{userId}")]
+        public async Task<IActionResult> GetTopUpHistoriesByUser(uint userId)
+        {
+            VerifyUserId(userId);
+            List<TopUpHistoryResponseDTO> resDTO = await _topUpService.GetTopUpHistoriesByUser(userId);
+            return Ok(resDTO);
         }
     }
 }
