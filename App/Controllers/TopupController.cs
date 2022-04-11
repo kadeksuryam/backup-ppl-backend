@@ -1,4 +1,5 @@
 ﻿using App.Authorization;
+using App.DTOs.Requests;
 using App.Helpers;
 using App.Models.Enums;
 using App.Services;
@@ -30,6 +31,24 @@ namespace App.Controllers
             return Ok(new SuccessDetails() {
                 StatusCode = (int)HttpStatusCode.OK, 
                 Data = await _topUpService.GetBankTopUpRequest(requestStatus)
+            });
+        }
+
+        [Authorize(Role = "Admin")]
+        [HttpPatch("requests")]
+        public async Task<IActionResult> UpdateRequestTopUp([FromBody] UpdateTopUpRequestStatusRequestDTO dto)
+        {
+            if (!Enum.TryParse(dto.Status, out RequestStatus requestStatus))
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid request status");
+            };
+
+            await _topUpService.UpdateBankTopUpRequest(dto);
+
+            return Ok(new SuccessDetails()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = new { message = "Given TopUp Request has been successfully updated" }
             });
         }
     }

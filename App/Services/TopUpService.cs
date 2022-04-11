@@ -1,8 +1,12 @@
-﻿using App.DTOs.Responses;
+﻿using App.Data;
+using App.DTOs.Requests;
+using App.DTOs.Responses;
+using App.Helpers;
 using App.Models;
 using App.Models.Enums;
 using App.Repositories;
 using AutoMapper;
+using System.Net;
 
 namespace App.Services
 {
@@ -10,12 +14,20 @@ namespace App.Services
 
     {
         private readonly IBankTopUpRequestRepository _bankTopUpRequestRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ITopUpHistoryRepository _topUpHistoryRepository;
+        private readonly DataContext _dataContext;
         private readonly IMapper _mapper;
 
-        public TopUpService(IBankTopUpRequestRepository bankTopUpRequestRepository, IMapper mapper)
+        public TopUpService(IBankTopUpRequestRepository bankTopUpRequestRepository, 
+            IMapper mapper, IUserRepository userRepository, 
+            ITopUpHistoryRepository topUpHistoryRepository, DataContext context)
         {
             _bankTopUpRequestRepository = bankTopUpRequestRepository;
+            _userRepository = userRepository;
             _mapper = mapper;
+            _topUpHistoryRepository = topUpHistoryRepository;
+            _dataContext = context;
         }
 
         public async Task<List<GetBankTopUpRequestResponseDTO>> GetBankTopUpRequest(RequestStatus? requestStatus)
@@ -39,6 +51,76 @@ namespace App.Services
                 response.Add(dto);
             }
             return response;
+        }
+
+        public async Task UpdateBankTopUpRequest(UpdateTopUpRequestStatusRequestDTO dto)
+        {
+            BankTopUpRequest? bankTopUpRequest = (await _bankTopUpRequestRepository.Get(dto.Id));
+            RequestStatus? requestStatus = (RequestStatus?)Enum.Parse(typeof(RequestStatus), dto.Status!);
+            User? userDb = bankTopUpRequest != null ? bankTopUpRequest!.From : null;
+            Bank? bankDb = bankTopUpRequest != null ? bankTopUpRequest!.Bank : null;
+
+            if (bankTopUpRequest == null)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid TopUp Request Id");
+            }
+            if (!bankTopUpRequest.Status.Equals(RequestStatus.Pending))
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid request status");
+            }
+
+            using var transaction = _dataContext.Database.BeginTransaction();
+            if (bankTopUpRequest.ExpiredDate.ToUniversalTime() < DateTime.UtcNow)
+            {
+                try
+                {
+                    bankTopUpRequest.Status = RequestStatus.Failed;
+                    bankTopUpRequest.UpdatedAt = DateTime.UtcNow;
+                    await _bankTopUpRequestRepository.Update(bankTopUpRequest);
+
+                    _dataContext.SaveChanges();
+                    transaction.Commit();
+                } catch(Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, ex.Message);
+                }
+                throw new HttpStatusCodeException(HttpStatusCode.UnprocessableEntity, "TopUp Request Expired");
+            }
+
+            try
+            {
+
+                bankTopUpRequest.Status = requestStatus;
+                bankTopUpRequest.UpdatedAt = DateTime.UtcNow;
+                if (requestStatus.Equals(RequestStatus.Success))
+                {
+                    userDb!.Balance += (uint)bankTopUpRequest.Amount;
+                    // increase the EXP?
+                    userDb!.Exp += 100;
+                }
+                TopUpHistory topUpHistory = new()
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Amount = bankTopUpRequest.Amount,
+                    Method = TopUpHistory.TopUpMethod.Bank,
+                    FromUserId = userDb!.Id,
+                    BankRequestId = bankDb!.Id,
+                    VoucherId = null
+                };
+                await _topUpHistoryRepository.Add(topUpHistory);
+                await _bankTopUpRequestRepository.Update(bankTopUpRequest);
+                await _userRepository.Update(userDb);
+
+                _dataContext.SaveChanges();
+                transaction.Commit();
+            } catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
         }
     }
 }

@@ -1,11 +1,14 @@
-﻿using App.DTOs.Responses;
+﻿using App.Data;
+using App.DTOs.Responses;
 using App.Helpers;
 using App.Models;
 using App.Models.Enums;
 using App.Repositories;
 using App.Services;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Moq;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -14,9 +17,13 @@ namespace Tests
     public class TopUpServiceTest
     {
         Mock<IBankTopUpRequestRepository>? mockTopUpReqRepo;
+        Mock<IUserRepository>? mockUserRepo;
+        Mock<ITopUpHistoryRepository>? mockTopUpHistoryRepository;
+        DataContext dataContext;
         MapperConfiguration? mapperConfig;
         Mapper? mapper;
         TopUpService? topUpService;
+        DbContextOptions<DataContext> options = new DbContextOptionsBuilder<DataContext>().Options;
 
         private void Initialize()
         {
@@ -25,8 +32,12 @@ namespace Tests
             {
                 cfg.AddProfile(new AutoMapperProfile());
             });
+            mockUserRepo = new Mock<IUserRepository>();
+            mockTopUpHistoryRepository = new Mock<ITopUpHistoryRepository>();
+            dataContext = new DataContext(options);
             mapper = new Mapper(mapperConfig);
-            topUpService = new TopUpService(mockTopUpReqRepo.Object, mapper);
+            topUpService = new TopUpService(mockTopUpReqRepo.Object, mapper,
+                mockUserRepo.Object, mockTopUpHistoryRepository.Object, dataContext);
         }
 
         [Fact]
