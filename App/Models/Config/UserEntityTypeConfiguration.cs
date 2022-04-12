@@ -93,6 +93,19 @@ namespace App.Models.Config
                 LevelId = 1,
                 Type = User.LoginType.Standard,
                 Role = User.UserRole.Admin,
+            },
+            new User
+            {
+                Id = 2,
+                UserName = "tes1",
+                EncryptedPassword = _bcryptWrapper.hashPassword("tes1"),
+                DisplayName = "tes1",
+                Email = "tes1@cakrawala.id",
+                Balance = 0,
+                Exp = 0,
+                LevelId = 1,
+                Type = User.LoginType.Standard,
+                Role = User.UserRole.Customer,
             });
         }
     }

@@ -1,5 +1,6 @@
-﻿using App.DTOs.Requests;
 using App.DTOs.Responses;
+﻿using App.DTOs.Requests;
+using App.Models;
 using App.Models.Enums;
 
 namespace App.Services
@@ -8,5 +9,6 @@ namespace App.Services
     {
         Task<List<GetBankTopUpRequestResponseDTO>> GetBankTopUpRequest(RequestStatus? requestStatus);
         Task UpdateBankTopUpRequest(UpdateTopUpRequestStatusRequestDTO dto);
+        Task<GetTopUpHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam);
     }
 }

@@ -10,6 +10,7 @@ namespace App.Models.Config
             ConfigureTable(builder);
             ConfigureAttributes(builder);
             ConfigureRelations(builder);
+            AddSeed(builder);
         }
 
         private static void ConfigureTable(EntityTypeBuilder<Bank> builder)
@@ -39,6 +40,17 @@ namespace App.Models.Config
             builder.HasMany(b => b.BankTopUpRequests)
                 .WithOne(r => r.Bank)
                 .HasForeignKey(r => r.BankId);
+        }
+
+
+        private void AddSeed(EntityTypeBuilder<Bank> builder)
+        {
+            builder.HasData(new Bank
+            {
+                Id = 1,
+                Name = "TESTBANK",
+                AccountNumber = 999999,
+            });
         }
 
     }

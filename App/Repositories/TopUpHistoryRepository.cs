@@ -1,6 +1,6 @@
 ﻿using App.Data;
 using App.Models;
-
+using Microsoft.EntityFrameworkCore;
 namespace App.Repositories
 {
     public class TopUpHistoryRepository : ITopUpHistoryRepository
@@ -16,6 +16,17 @@ namespace App.Repositories
             _context.TopUpHistories.Add(entity);
             await _context.SaveChangesAsync();
             return entity;
+        }
+
+        public async Task<PagedList<TopUpHistory>> GetAll(PagingParameters getAllParameters)
+        {
+            return await PagedList<TopUpHistory>.ToPagedListAsync(
+                _context.TopUpHistories
+                .Include(b => b.From)
+                .Include(b => b.BankRequest)
+                .Include(b => b.BankRequest != null ? b.BankRequest.Bank : null)
+                .Include(b => b.Voucher)
+                .OrderBy(b => b.Id), getAllParameters);
         }
     }
 }

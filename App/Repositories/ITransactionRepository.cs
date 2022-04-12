@@ -8,5 +8,6 @@ namespace App.Repositories
         Task<TransactionHistory> Update(TransactionHistory entity);
         Task<TransactionHistory?> Delete(int id);
         Task<TransactionHistory?> Get(int id);
+        Task<PagedList<TransactionHistory>> GetAll(PagingParameters getAllParameters);
     }
 }

@@ -178,6 +178,11 @@ namespace App.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "banks",
+                columns: new[] { "id", "account_number", "name" },
+                values: new object[] { 1L, 999999L, "TESTBANK" });
+
+            migrationBuilder.InsertData(
                 table: "levels",
                 columns: new[] { "id", "name" },
                 values: new object[] { 1L, "Bronze" });
@@ -195,9 +200,43 @@ namespace App.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "vouchers",
+                columns: new[] { "id", "amount", "code", "created_at", "updated_at" },
+                values: new object[] { 1L, 50000L, "ZZZZZZ", "2022-04-12 22:56:23.045609", "2022-04-12 22:56:23.045609" });
+
+            migrationBuilder.InsertData(
                 table: "users",
                 columns: new[] { "id", "display_name", "email", "encrypted_password", "levelId", "user_role", "username" },
-                values: new object[] { 1L, "Admin", "admin@cakrawala.id", "$2a$11$8q8wtz/18sC0Ih2cgejiV.SoqP8SbHNOhM8RxqkE0exo0iyQ6/eNK", 1L, "Admin", "cakrawalaid" });
+                values: new object[] { 1L, "Admin", "admin@cakrawala.id", "$2a$11$uauuW3lKAbyZ1T4pL7qLMeEurg5dAy0pE7HIEcp6eNxT4jrP6GjLy", 1L, "Admin", "cakrawalaid" });
+
+            migrationBuilder.InsertData(
+                table: "users",
+                columns: new[] { "id", "display_name", "email", "encrypted_password", "levelId", "username" },
+                values: new object[] { 2L, "tes1", "tes1@cakrawala.id", "$2a$11$ir4erFZDv.M5lT8jzdtTy.Jf4rt1BGkoh.vUc2y3gMeKIRy.yVnsm", 1L, "tes1" });
+
+            migrationBuilder.InsertData(
+                table: "bank_topup_request",
+                columns: new[] { "id", "amount", "bank_id", "created_at", "expired_date", "from_user_id", "status", "updated_at" },
+                values: new object[] { 1L, 50000, 1L, "2022-04-12 22:56:23.04553", "2022-04-13 22:56:23.04553", 1L, "Success", "2022-04-12 22:56:23.04553" });
+
+            migrationBuilder.InsertData(
+                table: "topup_histories",
+                columns: new[] { "id", "amount", "bank_request_id", "created_at", "from_user_id", "method", "updated_at", "voucher_id" },
+                values: new object[] { 1L, 5000, null, "2022-04-12 22:56:23.045401", 1L, "Voucher", "2022-04-12 22:56:23.045402", 1L });
+
+            migrationBuilder.InsertData(
+                table: "transaction_histories",
+                columns: new[] { "id", "amount", "created_at", "from_user_id", "status", "to_user_id", "updated_at" },
+                values: new object[,]
+                {
+                    { 1L, 5000L, "2022-04-12 22:56:23.046833", 1L, "Success", 2L, "2022-04-12 22:56:23.046833" },
+                    { 2L, 5000L, "2022-04-12 22:56:23.046833", 2L, "Success", 1L, "2022-04-12 22:56:23.046833" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "topup_histories",
+                columns: new[] { "id", "amount", "bank_request_id", "created_at", "from_user_id", "method", "updated_at", "voucher_id" },
+                values: new object[] { 2L, 50000, 1L, "2022-04-12 22:56:23.045402", 1L, "Bank", "2022-04-12 22:56:23.045403", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_bank_topup_request_bank_id",
