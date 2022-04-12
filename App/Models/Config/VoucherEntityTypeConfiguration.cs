@@ -40,6 +40,7 @@ namespace App.Models.Config
                 .HasDefaultValue(false);
 
             ConfigureRelations(builder);
+            AddSeed(builder);
         }
 
         private static void ConfigureRelations(EntityTypeBuilder<Voucher> builder)
@@ -47,6 +48,19 @@ namespace App.Models.Config
             builder.HasOne(v => v.History)
                 .WithOne(h => h.Voucher)
                 .HasForeignKey<TopUpHistory>(h => h.VoucherId);
+        }
+
+        private void AddSeed(EntityTypeBuilder<Voucher> builder)
+        {
+            builder.HasData(new Voucher
+            {
+                Id = 1,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Code = "ZZZZZZ",
+                Amount = 50000,
+                IsUsed = false,
+            });
         }
     }
 }

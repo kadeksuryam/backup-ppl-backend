@@ -7,5 +7,6 @@ namespace App.Services
     public interface ITransactionService
     {
         Task<CreateTransactionResponseDTO> CreateTransaction(CreateTransactionRequestDTO spec);
+        Task<GetTransactionHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam);
     }
 }

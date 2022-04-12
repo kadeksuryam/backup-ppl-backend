@@ -8,6 +8,7 @@ using App.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Net;
+using static App.DTOs.Responses.GetTransactionHistoryResponseDTO;
 
 namespace App.Services
 {
@@ -90,5 +91,42 @@ namespace App.Services
                 }
             }
         }
+
+        public async Task<GetTransactionHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam)
+        {
+
+            GetTransactionHistoryResponseDTO res = new GetTransactionHistoryResponseDTO();
+            res.TransactionHistories = new List<TransactionHistoryDTO>();
+
+            PagedList<TransactionHistory> histories = await _transactionRepository.GetAll(getAllParam);
+
+            
+
+            foreach (var history in histories)
+            {
+                System.Console.WriteLine(history);
+                TransactionHistoryDTO dto = new TransactionHistoryDTO()
+                {
+                    Id = history.Id,
+                    CreatedAt = history.CreatedAt.ToString("o"),
+                    UpdatedAt = history.CreatedAt.ToString("o"),
+                    From = _mapper.Map<UserDTO>(history.From),
+                    To = _mapper.Map<UserDTO>(history.To),
+                    Amount = history.Amount,
+                    Status = history.Status.ToString()
+                };
+                res.TransactionHistories.Add(dto);
+            }
+
+            res.Paging = new PagingDTO()
+            {
+                page = histories.CurrentPage,
+                size = histories.PageSize,
+                count = histories.Count,
+            };
+
+            return res;
+        }
+
     }
 }

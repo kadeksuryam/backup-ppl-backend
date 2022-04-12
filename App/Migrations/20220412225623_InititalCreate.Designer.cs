@@ -11,7 +11,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace App.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220331023932_InititalCreate")]
+    [Migration("20220412225623_InititalCreate")]
     partial class InititalCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -44,6 +44,14 @@ namespace App.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("banks", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            AccountNumber = 999999L,
+                            Name = "TESTBANK"
+                        });
                 });
 
             modelBuilder.Entity("App.Models.BankTopUpRequest", b =>
@@ -99,6 +107,19 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("bank_topup_request", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Amount = 50000,
+                            BankId = 1L,
+                            CreatedAt = "2022-04-12 22:56:23.04553",
+                            ExpiredDate = "2022-04-13 22:56:23.04553",
+                            FromUserId = 1L,
+                            Status = "Success",
+                            UpdatedAt = "2022-04-12 22:56:23.04553"
+                        });
                 });
 
             modelBuilder.Entity("App.Models.Level", b =>
@@ -221,6 +242,28 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("topup_histories", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Amount = 5000,
+                            CreatedAt = "2022-04-12 22:56:23.045401",
+                            FromUserId = 1L,
+                            Method = "Voucher",
+                            UpdatedAt = "2022-04-12 22:56:23.045402",
+                            VoucherId = 1L
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Amount = 50000,
+                            BankRequestId = 1L,
+                            CreatedAt = "2022-04-12 22:56:23.045402",
+                            FromUserId = 1L,
+                            Method = "Bank",
+                            UpdatedAt = "2022-04-12 22:56:23.045403"
+                        });
                 });
 
             modelBuilder.Entity("App.Models.TransactionHistory", b =>
@@ -269,6 +312,28 @@ namespace App.Migrations
                     b.HasIndex("ToUserId");
 
                     b.ToTable("transaction_histories", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Amount = 5000L,
+                            CreatedAt = "2022-04-12 22:56:23.046833",
+                            FromUserId = 1L,
+                            Status = "Success",
+                            ToUserId = 2L,
+                            UpdatedAt = "2022-04-12 22:56:23.046833"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Amount = 5000L,
+                            CreatedAt = "2022-04-12 22:56:23.046833",
+                            FromUserId = 2L,
+                            Status = "Success",
+                            ToUserId = 1L,
+                            UpdatedAt = "2022-04-12 22:56:23.046833"
+                        });
                 });
 
             modelBuilder.Entity("App.Models.User", b =>
@@ -352,12 +417,25 @@ namespace App.Migrations
                             Balance = 0L,
                             DisplayName = "Admin",
                             Email = "admin@cakrawala.id",
-                            EncryptedPassword = "$2a$11$8q8wtz/18sC0Ih2cgejiV.SoqP8SbHNOhM8RxqkE0exo0iyQ6/eNK",
+                            EncryptedPassword = "$2a$11$uauuW3lKAbyZ1T4pL7qLMeEurg5dAy0pE7HIEcp6eNxT4jrP6GjLy",
                             Exp = 0L,
                             LevelId = 1L,
                             Role = "Admin",
                             Type = "Standard",
                             UserName = "cakrawalaid"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Balance = 0L,
+                            DisplayName = "tes1",
+                            Email = "tes1@cakrawala.id",
+                            EncryptedPassword = "$2a$11$ir4erFZDv.M5lT8jzdtTy.Jf4rt1BGkoh.vUc2y3gMeKIRy.yVnsm",
+                            Exp = 0L,
+                            LevelId = 1L,
+                            Role = "Customer",
+                            Type = "Standard",
+                            UserName = "tes1"
                         });
                 });
 
@@ -401,6 +479,17 @@ namespace App.Migrations
                         .IsUnique();
 
                     b.ToTable("vouchers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Amount = 50000L,
+                            Code = "ZZZZZZ",
+                            CreatedAt = "2022-04-12 22:56:23.045609",
+                            IsUsed = false,
+                            UpdatedAt = "2022-04-12 22:56:23.045609"
+                        });
                 });
 
             modelBuilder.Entity("App.Models.BankTopUpRequest", b =>

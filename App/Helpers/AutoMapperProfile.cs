@@ -32,6 +32,11 @@ namespace App.Helpers
                     dest.PreviousBalance, opt => opt.Ignore())
                 .ForMember(dest =>
                     dest.CurrentBalance, opt => opt.Ignore());
+
+            CreateMap<User, GetTransactionHistoryResponseDTO.UserDTO>();
+            CreateMap<User, GetTopUpHistoryResponseDTO.UserDTO>();
+            CreateMap<Voucher, GetTopUpHistoryResponseDTO.VoucherDTO>();
+            CreateMap<Bank, GetTopUpHistoryResponseDTO.BankDTO>();
         }
 
     }

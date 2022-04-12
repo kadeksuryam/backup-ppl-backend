@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using App.Helpers;
 using System.Net;
 using System.Reflection;
+using App.Models;
+using System.Text.Json;
+using System.ComponentModel;
 
 namespace App.Controllers
 {
@@ -36,6 +39,16 @@ namespace App.Controllers
 
             var response = await _transactionService.CreateTransaction(dto);
             return Ok(response);
+        }
+
+        [Authorize(Role = "Admin")]
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistoryTransactions([FromQuery] PagingParameters getAllParameters) {
+            return Ok(new SuccessDetails()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = await _transactionService.GetHistoryTransaction(getAllParameters)
+            });
         }
     }
 }

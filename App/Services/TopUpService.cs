@@ -7,6 +7,7 @@ using App.Models.Enums;
 using App.Repositories;
 using AutoMapper;
 using System.Net;
+using static App.DTOs.Responses.GetTopUpHistoryResponseDTO;
 
 namespace App.Services
 {
@@ -121,6 +122,43 @@ namespace App.Services
                 throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, ex.Message);
             }
 
+        }
+
+        public async Task<GetTopUpHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam)
+        {
+
+            GetTopUpHistoryResponseDTO res = new GetTopUpHistoryResponseDTO();
+            res.TopUpHistories = new List<TopUpHistoryDTO>();
+
+            PagedList<TopUpHistory> histories = await _topUpHistoryRepository.GetAll(getAllParam);
+
+
+
+            foreach (var history in histories)
+            {
+                Console.WriteLine(history.BankRequest != null);
+                TopUpHistoryDTO dto = new TopUpHistoryDTO()
+                {
+                    Id = history.Id,
+                    CreatedAt = history.CreatedAt.ToString("o"),
+                    UpdatedAt = history.CreatedAt.ToString("o"),
+                    From = _mapper.Map<UserDTO>(history.From),
+                    Amount = (uint)history.Amount,
+                    Method = history.Method.ToString(),
+                    Voucher = _mapper.Map<VoucherDTO>(history.Voucher),
+                    Bank = history.BankRequest != null ? _mapper.Map<BankDTO>(history.BankRequest.Bank) : null
+                };
+                res.TopUpHistories.Add(dto);
+            }
+
+            res.Paging = new PagingDTO()
+            {
+                page = histories.CurrentPage,
+                size = histories.PageSize,
+                count = histories.Count,
+            };
+
+            return res;
         }
     }
 }

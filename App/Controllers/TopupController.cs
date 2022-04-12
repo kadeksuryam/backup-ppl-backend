@@ -1,6 +1,7 @@
 ﻿using App.Authorization;
 using App.DTOs.Requests;
 using App.Helpers;
+using App.Models;
 using App.Models.Enums;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -49,6 +50,17 @@ namespace App.Controllers
             {
                 StatusCode = (int)HttpStatusCode.OK,
                 Data = new { message = "Given TopUp Request has been successfully updated" }
+            });
+        }
+
+        [Authorize(Role = "Admin")]
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistoryTopUps([FromQuery] PagingParameters getAllParameters)
+        {
+            return Ok(new SuccessDetails()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = await _topUpService.GetHistoryTransaction(getAllParameters)
             });
         }
     }
