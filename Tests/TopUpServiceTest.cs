@@ -9,6 +9,7 @@ using AutoMapper;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -22,6 +23,8 @@ namespace Tests
         private Mock<IUserRepository>? mockUserRepo;
         private Mock<ITopUpHistoryRepository>? mockHistoryRepo;
         private Mock<IVoucherService>? mockVoucherService;
+        private CultureInfo? cultureInfo;
+        private const DateTimeStyles dateStyles = DateTimeStyles.None;
         private MapperConfiguration? mapperConfig;
         private Mapper? mapper;
         private TopUpService? topUpService;
@@ -32,9 +35,11 @@ namespace Tests
         private void Initialize()
         {
             mockBankRequestRepo = new Mock<IBankTopUpRequestRepository>();
+            AutoMapperProfile mapperProfile = new();
+            cultureInfo = mapperProfile.GetCultureInfo();
             mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile(new AutoMapperProfile());
+                cfg.AddProfile(mapperProfile);
             });
             mapper = new Mapper(mapperConfig);
             mockBankRepo = new();
@@ -60,6 +65,11 @@ namespace Tests
             mockUser.Id = userId;
             mockUser.Balance = 0;
             mockUserRepo!.Setup(repo => repo.GetById(userId)).ReturnsAsync(mockUser);
+        }
+        private DateTime ParseToDateTime(string dateString)
+        {
+            Assert.True(DateTime.TryParse(dateString, cultureInfo, dateStyles, out DateTime result));
+            return result;
         }
 
         [Fact]
@@ -106,9 +116,9 @@ namespace Tests
             Assert.Equal(mockBank!.AccountNumber, actualAccountNumber);
         }
 
-        private static void AssertParseableToDateTime(string expiredDate)
+        private void AssertParseableToDateTime(string expiredDate)
         {
-            Assert.True(DateTime.TryParse(expiredDate, out _));
+            ParseToDateTime(expiredDate);
         }
 
         private void AssertExactlyOneBankTopUpRequestAdded()
@@ -222,7 +232,8 @@ namespace Tests
         private void MakeMockTopUpHistoriesByUserId(uint userId)
         {
             mockHistories = new();
-            mockHistories.Add(new TopUpHistory() {
+            mockHistories.Add(new TopUpHistory()
+            {
                 UpdatedAt = DateTime.Now,
                 Method = TopUpHistory.TopUpMethod.Bank
             });
@@ -243,18 +254,12 @@ namespace Tests
         private void AssertTopUpHistoriesResponseSortedByTime(List<TopUpHistoryResponseDTO> response)
         {
             // Later first
-            Assert.True(DateTime.TryParse(
-                response[0].UpdatedAt,
-                out DateTime firstUpdateTime
-            ));
+            DateTime firstUpdateTime = ParseToDateTime(response[0].UpdatedAt);
 
             int responseIndex = 1;
             while (responseIndex < mockHistories.Count)
             {
-                Assert.True(DateTime.TryParse(
-                    response[responseIndex].UpdatedAt,
-                    out DateTime secondUpdateTime
-                ));
+                DateTime secondUpdateTime = ParseToDateTime(response[responseIndex].UpdatedAt);
                 Assert.True(DateTime.Compare(firstUpdateTime, secondUpdateTime) > 0);
 
                 firstUpdateTime = secondUpdateTime;

@@ -8,6 +8,7 @@ using AutoMapper;
 using Moq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Xunit;
 
 namespace Tests
@@ -18,6 +19,8 @@ namespace Tests
         private Mock<IUserRepository> mockUserRepo = new();
         private Mock<ITransactionRepository> mockTransactionRepo = new();
         private Mock<IDataContext>? mockDataContext;
+        private CultureInfo? cultureInfo;
+        private const DateTimeStyles dateStyles = DateTimeStyles.None;
         private Mapper? mapper;
         private TransactionService? service;
         private List<TransactionHistory> mockHistories = new();
@@ -37,10 +40,11 @@ namespace Tests
             mockUserRepo = new();
             mockTransactionRepo = new();
             mockDataContext = new();
-
+            AutoMapperProfile mapperProfile = new();
+            cultureInfo = mapperProfile.GetCultureInfo();
             MapperConfiguration mapperConfig = new(cfg =>
             {
-                cfg.AddProfile(new AutoMapperProfile());
+                cfg.AddProfile(mapperProfile);
             });
 
             mapper = new Mapper(mapperConfig);
@@ -86,23 +90,22 @@ namespace Tests
         private void AssertTransactionHistoriesResponseSortedByTime(List<TransactionHistoryResponseDTO> response)
         {
             // Later first
-            Assert.True(DateTime.TryParse(
-                response[0].UpdatedAt,
-                out DateTime firstUpdateTime
-            ));
+            DateTime firstUpdateTime = ParseToDateTime(response[0].UpdatedAt);
 
             int responseIndex = 1;
             while (responseIndex < mockHistories.Count)
             {
-                Assert.True(DateTime.TryParse(
-                    response[responseIndex].UpdatedAt,
-                    out DateTime secondUpdateTime
-                ));
+                DateTime secondUpdateTime = ParseToDateTime(response[responseIndex].UpdatedAt);
                 Assert.True(DateTime.Compare(firstUpdateTime, secondUpdateTime) > 0);
 
                 firstUpdateTime = secondUpdateTime;
                 responseIndex++;
             }
+        }
+        private DateTime ParseToDateTime(string dateString)
+        {
+            Assert.True(DateTime.TryParse(dateString, cultureInfo, dateStyles, out DateTime result));
+            return result;
         }
     }
 }

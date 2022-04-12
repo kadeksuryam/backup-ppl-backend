@@ -2,12 +2,16 @@
 using App.DTOs.Responses;
 using App.Models;
 using AutoMapper;
+using System.Globalization;
 
 namespace App.Helpers
 {
     public class AutoMapperProfile : Profile
     {
-        const string DateFormat = "dd/MM/yyyy, HH:mm";
+        const string DateFormat = "f"; // day + full date + hour-minute
+        const string CultureInfoCode = "id-ID"; // Indonesia
+
+        static readonly CultureInfo cultureInfo = new(CultureInfoCode);
 
         public AutoMapperProfile()
         {
@@ -26,7 +30,7 @@ namespace App.Helpers
             CreateMap<BankTopUpRequest, BankTopUpResponseDTO>()
                 .ForMember(dest =>
                     dest.ExpiredDate, opt => opt.MapFrom(src =>
-                        src.ExpiredDate.ToString(DateFormat)));
+                        ToDateString(src.ExpiredDate)));
 
             CreateMap<User, GetBankTopUpRequestResponseDTO.UserDTO>();
             CreateMap<Bank, GetBankTopUpRequestResponseDTO.BankDTO>();
@@ -55,10 +59,10 @@ namespace App.Helpers
             CreateMap<TopUpHistory, TopUpHistoryResponseDTO>()
                 .ForMember(dest =>
                     dest.CreatedAt, opt => opt.MapFrom(src =>
-                        src.CreatedAt.ToString(DateFormat)))
+                        ToDateString(src.CreatedAt)))
                 .ForMember(dest =>
                     dest.UpdatedAt, opt => opt.MapFrom(src =>
-                        src.UpdatedAt.ToString(DateFormat)))
+                        ToDateString(src.UpdatedAt)))
                 .ForMember(dest =>
                     dest.Method, opt => opt.MapFrom(src =>
                         src.Method.ToString()));
@@ -66,13 +70,23 @@ namespace App.Helpers
             CreateMap<TransactionHistory, TransactionHistoryResponseDTO>()
                 .ForMember(dest =>
                     dest.CreatedAt, opt => opt.MapFrom(src =>
-                        src.CreatedAt.ToString(DateFormat)))
+                        ToDateString(src.CreatedAt)))
                 .ForMember(dest =>
                     dest.UpdatedAt, opt => opt.MapFrom(src =>
-                        src.UpdatedAt.ToString(DateFormat)))
+                        ToDateString(src.UpdatedAt)))
                 .ForMember(dest =>
                     dest.Status, opt => opt.MapFrom(src =>
                         src.Status.ToString()));
+        }
+
+        private static string ToDateString(DateTime date)
+        {
+            return date.ToString(DateFormat, cultureInfo);
+        }
+
+        public CultureInfo GetCultureInfo()
+        {
+            return cultureInfo;
         }
     }
 }
