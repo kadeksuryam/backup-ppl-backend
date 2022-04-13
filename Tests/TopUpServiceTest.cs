@@ -160,9 +160,9 @@ namespace Tests
         public async void VoucherTopUp_ValidData_ReturnsSuccess()
         {
             Initialize();
-            uint userId = GetAuthenticatedUserId();
+            // uint userId = GetAuthenticatedUserId();
             VoucherTopUpRequestDTO request = GetValidVoucherTopUpRequest();
-            VoucherTopUpResponseDTO response = await MakeVoucherTopUp(userId, request);
+            VoucherTopUpResponseDTO response = await MakeVoucherTopUp(request);
 
             AssertValidVoucherTopUpResponse(response);
             AssertExactlyOneVoucherUsage();
@@ -172,8 +172,11 @@ namespace Tests
 
         private VoucherTopUpRequestDTO GetValidVoucherTopUpRequest()
         {
-            VoucherTopUpRequestDTO request = new();
-            request.VoucherCode = "FREEMONEY";
+            VoucherTopUpRequestDTO request = new()
+            {
+                VoucherCode = "FREEMONEY",
+                UserId = 1234
+            };
 
             MakeVoucherRequestValid(request);
             return request;
@@ -181,23 +184,32 @@ namespace Tests
 
         private void MakeVoucherRequestValid(VoucherTopUpRequestDTO request)
         {
-            mockVoucher = new();
-            mockVoucher.Code = request.VoucherCode;
-            mockVoucher.Amount = 25000;
-            mockVoucher.IsUsed = false;
+            MakeUserIdAuthenticated(request.UserId);
+            MakeVoucherCodeValid(request.VoucherCode);
+        }
+
+        private void MakeVoucherCodeValid(string voucherCode)
+        {
+            mockVoucher = new()
+            {
+                Code = voucherCode,
+                Amount = 25000,
+                IsUsed = false
+            };
 
             mockVoucherService!.Setup(service => service.UseVoucher(mockVoucher.Code))
                 .ReturnsAsync(MarkAsUsedAndGetMockVoucher);
         }
+
         private Voucher MarkAsUsedAndGetMockVoucher()
         {
             mockVoucher!.IsUsed = true;
             return mockVoucher;
         }
 
-        private async Task<VoucherTopUpResponseDTO> MakeVoucherTopUp(uint userId, VoucherTopUpRequestDTO request)
+        private async Task<VoucherTopUpResponseDTO> MakeVoucherTopUp(VoucherTopUpRequestDTO request)
         {
-            return await topUpService!.VoucherTopUp(userId, request);
+            return await topUpService!.VoucherTopUp(request);
         }
 
         private void AssertValidVoucherTopUpResponse(VoucherTopUpResponseDTO response)

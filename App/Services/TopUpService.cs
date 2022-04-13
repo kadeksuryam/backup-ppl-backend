@@ -92,15 +92,15 @@ namespace App.Services
             return response;
         }
 
-        public async Task<VoucherTopUpResponseDTO> VoucherTopUp(uint userId, VoucherTopUpRequestDTO request)
+        public async Task<VoucherTopUpResponseDTO> VoucherTopUp(VoucherTopUpRequestDTO request)
         {
             Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode);
 
-            User? user = await _userRepo.GetById(userId);
+            User? user = await _userRepo.GetById(request.UserId);
             user!.Balance += voucher.Amount;
 
             TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
-            history.FromUserId = userId;
+            history.FromUserId = request.UserId;
 
             VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
 

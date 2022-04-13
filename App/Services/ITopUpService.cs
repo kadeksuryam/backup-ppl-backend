@@ -8,7 +8,7 @@ namespace App.Services
     {
         Task<BankTopUpResponseDTO> BankTopUp(BankTopUpRequestDTO request);
         Task<List<GetBankTopUpRequestResponseDTO>> GetBankTopUpRequest(RequestStatus? requestStatus);
-        Task<VoucherTopUpResponseDTO> VoucherTopUp(uint userId, VoucherTopUpRequestDTO request);
+        Task<VoucherTopUpResponseDTO> VoucherTopUp(VoucherTopUpRequestDTO request);
         Task<List<TopUpHistoryResponseDTO>> GetTopUpHistoriesByUser(uint userId);
     }
 }

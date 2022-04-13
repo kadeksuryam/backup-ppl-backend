@@ -56,11 +56,11 @@ namespace App.Controllers
         }
 
         [Authorize(Role = "Customer")]
-        [HttpPost("users/{userId}/voucher/use")]
-        public async Task<IActionResult> VoucherTopUp(uint userId, [FromBody] VoucherTopUpRequestDTO reqDTO)
+        [HttpPost("voucher")]
+        public async Task<IActionResult> VoucherTopUp([FromBody] VoucherTopUpRequestDTO reqDTO)
         {
-            VerifyUserId(userId);
-            VoucherTopUpResponseDTO resDTO = await _topUpService.VoucherTopUp(userId, reqDTO);
+            VerifyUserId(reqDTO.UserId);
+            VoucherTopUpResponseDTO resDTO = await _topUpService.VoucherTopUp(reqDTO);
             return Ok(resDTO);
         }
 
