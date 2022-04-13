@@ -9,7 +9,7 @@ namespace App.Services
         Task Register(RegisterRequestDTO dto);
         Task<LoginResponseDTO> Login(LoginRequestDTO dto);
         Task UpdateProfile(uint userId, UpdateProfileRequestDTO dto);
-
         Task<GetProfileResponseDTO> GetProfile(uint userId);
+        Task<GetDisplayNameResponseDTO> GetDisplayName(string userName);
     }
 }
