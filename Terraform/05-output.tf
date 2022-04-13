@@ -10,3 +10,7 @@ output "tls_private_key" {
   value     = tls_private_key.sshKey.private_key_pem
   sensitive = true
 }
+
+output "dns_name_label_name" {
+  value = var.dns_name_label
+}
