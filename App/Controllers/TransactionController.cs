@@ -38,10 +38,11 @@ namespace App.Controllers
 
         [Authorize(Role = "Customer")]
         [HttpGet("users/{userId}")]
-        public async Task<IActionResult> GetTopUpHistoriesByUser(uint userId)
+        public async Task<IActionResult> GetTransactionHistoriesByUser(uint userId)
         {
             VerifyUserId(userId);
-            List<TransactionHistoryResponseDTO> resDTO = await _transactionService.GetTransactionHistoriesByUser(userId);
+            List<TransactionHistoryResponseDTO> resDTO =
+                await _transactionService.GetTransactionHistoriesByUser(userId);
             return Ok(resDTO);
         }
         private void VerifyUserId(uint userId)
