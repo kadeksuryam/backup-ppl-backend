@@ -47,15 +47,14 @@ namespace App.Controllers
         }
 
         [Authorize(Role = "Customer")]
-        [HttpPost("users/{userId}/bank/make-request")]
-        public async Task<IActionResult> BankTopUp(uint userId, [FromBody] BankTopUpRequestDTO reqDTO)
+        [HttpPost("bank")]
+        public async Task<IActionResult> BankTopUp([FromBody] BankTopUpRequestDTO reqDTO)
         {
-            VerifyUserId(userId);
-            BankTopUpResponseDTO resDTO = await _topUpService.BankTopUp(userId, reqDTO);
+            VerifyUserId(reqDTO.UserId);
+            BankTopUpResponseDTO resDTO = await _topUpService.BankTopUp(reqDTO);
             return Ok(resDTO);
         }
 
-        
         [Authorize(Role = "Customer")]
         [HttpPost("users/{userId}/voucher/use")]
         public async Task<IActionResult> VoucherTopUp(uint userId, [FromBody] VoucherTopUpRequestDTO reqDTO)

@@ -26,7 +26,10 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.Level, opt => opt.Ignore());
 
-            CreateMap<BankTopUpRequestDTO, BankTopUpRequest>();
+            CreateMap<BankTopUpRequestDTO, BankTopUpRequest>()
+                .ForMember(dest =>
+                    dest.FromUserId, opt => opt.MapFrom(src =>
+                        src.UserId));
             CreateMap<BankTopUpRequest, BankTopUpResponseDTO>()
                 .ForMember(dest =>
                     dest.ExpiredDate, opt => opt.MapFrom(src =>

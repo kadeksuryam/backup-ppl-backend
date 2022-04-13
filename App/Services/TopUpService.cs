@@ -32,7 +32,7 @@ namespace App.Services
             _mapper = mapper;
         }
 
-        public async Task<BankTopUpResponseDTO> BankTopUp(uint userId, BankTopUpRequestDTO requestDto)
+        public async Task<BankTopUpResponseDTO> BankTopUp(BankTopUpRequestDTO requestDto)
         {
             SelectedBank = await _bankRepo.GetById(requestDto.BankId);
             if (SelectedBank == null)
@@ -41,13 +41,13 @@ namespace App.Services
             }
             else
             {
-                return await ExecuteBankTopUpRequestCreation(userId, requestDto);
+                return await ExecuteBankTopUpRequestCreation(requestDto);
             }
         }
 
-        private async Task<BankTopUpResponseDTO> ExecuteBankTopUpRequestCreation(uint userId, BankTopUpRequestDTO requestDto)
+        private async Task<BankTopUpResponseDTO> ExecuteBankTopUpRequestCreation(BankTopUpRequestDTO requestDto)
         {
-            BankTopUpRequest topUpRequest = CreateBankTopUpRequest(userId, requestDto);
+            BankTopUpRequest topUpRequest = CreateBankTopUpRequest(requestDto);
             await _bankRequestRepo.Add(topUpRequest);
             return CreateBankTopUpRequestDTO(topUpRequest);
         }
@@ -59,13 +59,12 @@ namespace App.Services
             return response;
         }
 
-        private BankTopUpRequest CreateBankTopUpRequest(uint userId, BankTopUpRequestDTO requestDto)
+        private BankTopUpRequest CreateBankTopUpRequest(BankTopUpRequestDTO requestDto)
         {
             BankTopUpRequest topUpRequest = _mapper.Map<BankTopUpRequest>(requestDto);
             topUpRequest.CreatedAt = DateTime.Now;
             topUpRequest.UpdatedAt = DateTime.Now;
             topUpRequest.ExpiredDate = DateTime.Now.AddDays(3); // Asumsikan pengguna diberi kesempatan 3 hari
-            topUpRequest.FromUserId = userId;
             topUpRequest.Status = RequestStatus.Pending;
             return topUpRequest;
         }

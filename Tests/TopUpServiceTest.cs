@@ -76,18 +76,20 @@ namespace Tests
         public async void BankTopUp_ValidRequest_ReturnsSuccessAsync()
         {
             Initialize();
-            uint userId = GetAuthenticatedUserId();
             BankTopUpRequestDTO request = GetValidBankTopUpRequest();
-            BankTopUpResponseDTO response = await MakeBankTopUp(userId, request);
+            BankTopUpResponseDTO response = await MakeBankTopUp(request);
             AssertValidBankTopUpResponse(response);
             AssertExactlyOneBankTopUpRequestAdded();
         }
 
         private BankTopUpRequestDTO GetValidBankTopUpRequest()
         {
-            BankTopUpRequestDTO request = new();
-            request.Amount = 50000;
-            request.BankId = 6789;
+            BankTopUpRequestDTO request = new()
+            {
+                Amount = 50000,
+                BankId = 6789,
+                UserId = 1234
+            };
 
             MakeBankRequestValid(request);
             return request;
@@ -95,14 +97,22 @@ namespace Tests
 
         private void MakeBankRequestValid(BankTopUpRequestDTO request)
         {
-            mockBank = new();
-            mockBank.Id = request.BankId;
-            mockBankRepo!.Setup(repo => repo.GetById(request.BankId)).ReturnsAsync(mockBank);
+            MakeUserIdAuthenticated(request.UserId);
+            MakeBankIdValid(request.BankId);
         }
 
-        private async Task<BankTopUpResponseDTO> MakeBankTopUp(uint userId, BankTopUpRequestDTO request)
+        private void MakeBankIdValid(uint bankId)
         {
-            return await topUpService!.BankTopUp(userId, request);
+            mockBank = new()
+            {
+                Id = bankId
+            };
+            mockBankRepo!.Setup(repo => repo.GetById(bankId)).ReturnsAsync(mockBank);
+        }
+
+        private async Task<BankTopUpResponseDTO> MakeBankTopUp(BankTopUpRequestDTO request)
+        {
+            return await topUpService!.BankTopUp(request);
         }
 
         private void AssertValidBankTopUpResponse(BankTopUpResponseDTO response)

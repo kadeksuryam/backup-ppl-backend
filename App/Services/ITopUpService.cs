@@ -6,7 +6,7 @@ namespace App.Services
 {
     public interface ITopUpService
     {
-        Task<BankTopUpResponseDTO> BankTopUp(uint userId, BankTopUpRequestDTO request);
+        Task<BankTopUpResponseDTO> BankTopUp(BankTopUpRequestDTO request);
         Task<List<GetBankTopUpRequestResponseDTO>> GetBankTopUpRequest(RequestStatus? requestStatus);
         Task<VoucherTopUpResponseDTO> VoucherTopUp(uint userId, VoucherTopUpRequestDTO request);
         Task<List<TopUpHistoryResponseDTO>> GetTopUpHistoriesByUser(uint userId);
