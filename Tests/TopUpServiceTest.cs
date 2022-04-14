@@ -57,7 +57,6 @@ namespace Tests
         private void InitializeMapper()
         {
             AutoMapperProfile mapperProfile = new();
-            cultureInfo = mapperProfile.GetCultureInfo();
 
             MapperConfiguration mapperConfig = new(cfg =>
             {
@@ -148,7 +147,6 @@ namespace Tests
         private void AssertValidBankTopUpResponse(BankTopUpResponseDTO response)
         {
             AssertAccountNumberMatch(response.AccountNumber);
-            AssertParseableToDateTime(response.ExpiredDate);
         }
 
         private void AssertAccountNumberMatch(long actualAccountNumber)
@@ -156,10 +154,6 @@ namespace Tests
             Assert.Equal(mockBank!.AccountNumber, actualAccountNumber);
         }
 
-        private void AssertParseableToDateTime(string expiredDate)
-        {
-            ParseToDateTime(expiredDate);
-        }
 
         private void AssertExactlyOneBankTopUpRequestAdded()
         {
@@ -306,12 +300,12 @@ namespace Tests
         private void AssertTopUpHistoriesResponseSortedByTime(List<TopUpHistoryResponseDTO> response)
         {
             // Later first
-            DateTime firstUpdateTime = ParseToDateTime(response[0].UpdatedAt);
+            DateTime firstUpdateTime = response[0].UpdatedAt;
 
             int responseIndex = 1;
             while (responseIndex < mockHistories.Count)
             {
-                DateTime secondUpdateTime = ParseToDateTime(response[responseIndex].UpdatedAt);
+                DateTime secondUpdateTime = response[responseIndex].UpdatedAt;
                 Assert.True(DateTime.Compare(firstUpdateTime, secondUpdateTime) > 0);
 
                 firstUpdateTime = secondUpdateTime;

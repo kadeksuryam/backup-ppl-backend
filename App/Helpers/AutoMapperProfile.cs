@@ -8,11 +8,6 @@ namespace App.Helpers
 {
     public class AutoMapperProfile : Profile
     {
-        const string DateFormat = "f"; // day + full date + hour-minute
-        const string CultureInfoCode = "id-ID"; // Indonesia
-
-        static readonly CultureInfo cultureInfo = new(CultureInfoCode);
-
         public AutoMapperProfile()
         {
             CreateMap<RegisterRequestDTO, User>()
@@ -30,10 +25,7 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.FromUserId, opt => opt.MapFrom(src =>
                         src.UserId));
-            CreateMap<BankTopUpRequest, BankTopUpResponseDTO>()
-                .ForMember(dest =>
-                    dest.ExpiredDate, opt => opt.MapFrom(src =>
-                        ToDateString(src.ExpiredDate)));
+            CreateMap<BankTopUpRequest, BankTopUpResponseDTO>();
             CreateMap<User, GetDisplayNameResponseDTO>();
 
             CreateMap<User, GetBankTopUpRequestResponseDTO.UserDTO>();
@@ -62,22 +54,10 @@ namespace App.Helpers
 
             CreateMap<TopUpHistory, TopUpHistoryResponseDTO>()
                 .ForMember(dest =>
-                    dest.CreatedAt, opt => opt.MapFrom(src =>
-                        ToDateString(src.CreatedAt)))
-                .ForMember(dest =>
-                    dest.UpdatedAt, opt => opt.MapFrom(src =>
-                        ToDateString(src.UpdatedAt)))
-                .ForMember(dest =>
                     dest.Method, opt => opt.MapFrom(src =>
                         src.Method.ToString()));
 
             CreateMap<TransactionHistory, TransactionHistoryResponseDTO>()
-                .ForMember(dest =>
-                    dest.CreatedAt, opt => opt.MapFrom(src =>
-                        ToDateString(src.CreatedAt)))
-                .ForMember(dest =>
-                    dest.UpdatedAt, opt => opt.MapFrom(src =>
-                        ToDateString(src.UpdatedAt)))
                 .ForMember(dest =>
                     dest.Status, opt => opt.MapFrom(src =>
                         src.Status.ToString()));
@@ -86,16 +66,6 @@ namespace App.Helpers
             CreateMap<User, GetTopUpHistoryResponseDTO.UserDTO>();
             CreateMap<Voucher, GetTopUpHistoryResponseDTO.VoucherDTO>();
             CreateMap<Bank, GetTopUpHistoryResponseDTO.BankDTO>();
-        }
-
-        private static string ToDateString(DateTime date)
-        {
-            return date.ToString(DateFormat, cultureInfo);
-        }
-
-        public CultureInfo GetCultureInfo()
-        {
-            return cultureInfo;
         }
     }
 }

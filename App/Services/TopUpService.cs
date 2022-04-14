@@ -85,9 +85,9 @@ namespace App.Services
                 GetBankTopUpRequestResponseDTO dto = new GetBankTopUpRequestResponseDTO()
                 {
                     Id = request.Id,
-                    CreatedAt = request.CreatedAt.ToString("o"),
-                    UpdatedAt = request.UpdatedAt.ToString("o"),
-                    ExpiredDate = request.ExpiredDate.ToString("o"),
+                    CreatedAt = request.CreatedAt,
+                    UpdatedAt = request.UpdatedAt,
+                    ExpiredDate = request.ExpiredDate,
                     Amount = request.Amount,
                     Bank = _mapper.Map<GetBankTopUpRequestResponseDTO.BankDTO>(request.Bank),
                     From = _mapper.Map<GetBankTopUpRequestResponseDTO.UserDTO>(request.From),
@@ -217,8 +217,8 @@ namespace App.Services
                 TopUpHistoryDTO dto = new TopUpHistoryDTO()
                 {
                     Id = history.Id,
-                    CreatedAt = history.CreatedAt.ToString("o"),
-                    UpdatedAt = history.CreatedAt.ToString("o"),
+                    CreatedAt = history.CreatedAt,
+                    UpdatedAt = history.CreatedAt,
                     From = _mapper.Map<UserDTO>(history.From),
                     Amount = (uint)history.Amount,
                     Method = history.Method.ToString(),

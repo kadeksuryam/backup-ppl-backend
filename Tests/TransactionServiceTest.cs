@@ -41,7 +41,6 @@ namespace Tests
             mockTransactionRepo = new();
             mockDataContext = new();
             AutoMapperProfile mapperProfile = new();
-            cultureInfo = mapperProfile.GetCultureInfo();
             MapperConfiguration mapperConfig = new(cfg =>
             {
                 cfg.AddProfile(mapperProfile);
@@ -90,22 +89,17 @@ namespace Tests
         private void AssertTransactionHistoriesResponseSortedByTime(List<TransactionHistoryResponseDTO> response)
         {
             // Later first
-            DateTime firstUpdateTime = ParseToDateTime(response[0].UpdatedAt);
+            DateTime firstUpdateTime = response[0].UpdatedAt;
 
             int responseIndex = 1;
             while (responseIndex < mockHistories.Count)
             {
-                DateTime secondUpdateTime = ParseToDateTime(response[responseIndex].UpdatedAt);
+                DateTime secondUpdateTime = response[responseIndex].UpdatedAt;
                 Assert.True(DateTime.Compare(firstUpdateTime, secondUpdateTime) > 0);
 
                 firstUpdateTime = secondUpdateTime;
                 responseIndex++;
             }
-        }
-        private DateTime ParseToDateTime(string dateString)
-        {
-            Assert.True(DateTime.TryParse(dateString, cultureInfo, dateStyles, out DateTime result));
-            return result;
         }
     }
 }

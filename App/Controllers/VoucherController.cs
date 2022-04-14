@@ -23,7 +23,10 @@ namespace App.Controllers
         {
             var voucher = await _voucherService.GetByCode(code);
 
-            return Ok(voucher);
+            return Ok(new SuccessDetails()
+            {
+                Data = voucher
+            });
         }
     }
 }

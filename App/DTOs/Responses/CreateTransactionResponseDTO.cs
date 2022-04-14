@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using App.Helpers;
 
 namespace App.DTOs.Responses
 {
@@ -21,9 +22,11 @@ namespace App.DTOs.Responses
         [JsonPropertyName("id")]
         public uint Id { get; set; }
         [JsonPropertyName("created_at")]
-        public string? CreatedAt { get; set; }
+        [JsonConverter(typeof(DateTimeJSONConverter))]
+        public DateTime? CreatedAt { get; set; }
         [JsonPropertyName("updated_at")]
-        public string? UpdatedAt { get; set; }
+        [JsonConverter(typeof(DateTimeJSONConverter))]
+        public DateTime? UpdatedAt { get; set; }
         [JsonPropertyName("from")]
         public UserDTO? From { get; set; }
         [JsonPropertyName("to")]

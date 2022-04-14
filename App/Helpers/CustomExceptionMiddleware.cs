@@ -38,7 +38,6 @@ namespace App.Helpers
                 result = new ErrorDetails()
                 {
                     Message = exception.Message,
-                    StatusCode = (int)exception.StatusCode
                 }.ToString();
                 context.Response.StatusCode = (int)exception.StatusCode;
             }
@@ -47,7 +46,6 @@ namespace App.Helpers
                 result = new ErrorDetails()
                 {
                     Message = "Runtime Error",
-                    StatusCode = (int)HttpStatusCode.BadRequest
                 }.ToString();
                 context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             }
@@ -59,7 +57,6 @@ namespace App.Helpers
             string result = new ErrorDetails()
             {
                 Message = exception.Message,
-                StatusCode = (int)HttpStatusCode.InternalServerError
             }.ToString();
             context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
             return context.Response.WriteAsync(result);

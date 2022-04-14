@@ -1,4 +1,5 @@
-﻿using App.Helpers.FormatValidator;
+﻿using App.Helpers;
+using App.Helpers.FormatValidator;
 using System.Text.Json.Serialization;
 
 namespace App.DTOs.Responses
@@ -9,10 +10,12 @@ namespace App.DTOs.Responses
         public uint Id { get; set; }
 
         [JsonPropertyName("created_at")]
-        public string CreatedAt { get; set; } = "";
+        [JsonConverter(typeof(DateTimeJSONConverter))]
+        public DateTime CreatedAt { get; set; }
 
         [JsonPropertyName("updated_at")]
-        public string UpdatedAt { get; set; } = "";
+        [JsonConverter(typeof(DateTimeJSONConverter))]
+        public DateTime UpdatedAt { get; set; }
 
         [JsonPropertyName("amount")]
         public int Amount { get; set; }
