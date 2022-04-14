@@ -33,14 +33,16 @@ namespace App.Controllers
 
             return Ok(new SuccessDetails()
             {
-                StatusCode = (int)HttpStatusCode.OK,
                 Data = await _topUpService.GetBankTopUpRequest(requestStatus)
             });
         }
 
         private void VerifyUserId(uint userId)
         {
-            uint? currUserId = (uint?)HttpContext.Items["userId"];
+            ParsedToken? parsedToken = HttpContext.Items["userAttr"] as ParsedToken;
+
+
+            uint? currUserId = parsedToken!.userId;
             if (currUserId != userId)
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
@@ -53,7 +55,11 @@ namespace App.Controllers
         {
             VerifyUserId(reqDTO.UserId);
             BankTopUpResponseDTO resDTO = await _topUpService.BankTopUp(reqDTO);
-            return Ok(resDTO);
+
+            return Ok(new SuccessDetails()
+            {
+                Data = resDTO
+            });
         }
 
         [Authorize(Role = "Customer")]
@@ -62,7 +68,10 @@ namespace App.Controllers
         {
             VerifyUserId(reqDTO.UserId);
             VoucherTopUpResponseDTO resDTO = await _topUpService.VoucherTopUp(reqDTO);
-            return Ok(resDTO);
+            return Ok(new SuccessDetails()
+            {
+                Data = resDTO
+            });
         }
 
         [Authorize(Role = "Customer")]
@@ -71,7 +80,10 @@ namespace App.Controllers
         {
             VerifyUserId(userId);
             List<TopUpHistoryResponseDTO> resDTO = await _topUpService.GetTopUpHistoriesByUser(userId);
-            return Ok(resDTO);
+            return Ok(new SuccessDetails()
+            {
+                Data = resDTO
+            });
         }
 
         [Authorize(Role = "Admin")]
@@ -87,7 +99,6 @@ namespace App.Controllers
 
             return Ok(new SuccessDetails()
             {
-                StatusCode = (int)HttpStatusCode.OK,
                 Data = new { message = "Given TopUp Request has been successfully updated" }
             });
         }
@@ -98,7 +109,6 @@ namespace App.Controllers
         {
             return Ok(new SuccessDetails()
             {
-                StatusCode = (int)HttpStatusCode.OK,
                 Data = await _topUpService.GetHistoryTransaction(getAllParameters)
             });
 

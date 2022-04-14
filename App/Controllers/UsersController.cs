@@ -27,7 +27,10 @@ namespace App.Controllers
         public async Task<IActionResult> Register([FromBody] RegisterRequestDTO dto)
         {
             await _userService.Register(dto);
-            return Ok(new { message = "Registration successful" });
+            return Ok(new SuccessDetails()
+            {
+                Data = new { message = "Registration successful" }
+            });
         }
 
         [AllowAnonymous]
@@ -35,7 +38,10 @@ namespace App.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO reqDTO)
         {
             LoginResponseDTO resDTO = await _userService.Login(reqDTO);
-            return Ok(resDTO);
+            return Ok(new SuccessDetails()
+            {
+                Data = resDTO
+            });
         }
 
         [HttpGet("{userId}")]
@@ -53,7 +59,10 @@ namespace App.Controllers
 
             var response = await _userService.GetProfile(userId);
 
-            return Ok(response);
+            return Ok(new SuccessDetails()
+            {
+                Data = response
+            });
 
         }
 
@@ -62,7 +71,10 @@ namespace App.Controllers
         {
             var response = await _userService.GetDisplayName(userName);
 
-            return Ok(response);
+            return Ok(new SuccessDetails()
+            {
+                Data = response
+            });
         }
 
         [HttpPatch("{userId}")]
@@ -90,7 +102,10 @@ namespace App.Controllers
             
 
             await _userService.UpdateProfile(userId, dto);
-            return Ok(new { message = "Update profile successful" });
+            return Ok(new SuccessDetails()
+            {
+                Data = new { message = "Update profile successful" }
+            });
         }
 
         private bool isAllObjectPropertiesNull(Object obj)

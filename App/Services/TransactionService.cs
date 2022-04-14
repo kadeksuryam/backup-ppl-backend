@@ -121,8 +121,8 @@ namespace App.Services
                 TransactionHistoryDTO dto = new TransactionHistoryDTO()
                 {
                     Id = history.Id,
-                    CreatedAt = history.CreatedAt.ToString("o"),
-                    UpdatedAt = history.CreatedAt.ToString("o"),
+                    CreatedAt = history.CreatedAt,
+                    UpdatedAt = history.CreatedAt,
                     From = _mapper.Map<UserDTO>(history.From),
                     To = _mapper.Map<UserDTO>(history.To),
                     Amount = history.Amount,

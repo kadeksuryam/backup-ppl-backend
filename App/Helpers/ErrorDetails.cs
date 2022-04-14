@@ -5,10 +5,8 @@ namespace App.Helpers
 {
     public class ErrorDetails
     {
-        [JsonPropertyName("status_code")]
-        public int StatusCode { get; set; }
         [JsonPropertyName("errors")]
-        public string Message { get; set; }
+        public string? Message { get; set; }
 
         public override string ToString()
         {

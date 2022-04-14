@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using App.Helpers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace App.Models.Config
@@ -35,12 +36,12 @@ namespace App.Models.Config
             builder.Property(h => h.CreatedAt)
                 .IsRequired()
                 .HasColumnName("created_at")
-                .HasConversion<string>();
+                .HasConversion<DateTimeModelConverter>();
 
             builder.Property(h => h.UpdatedAt)
                 .IsRequired()
                 .HasColumnName("updated_at")
-                .HasConversion<string>();
+                .HasConversion<DateTimeModelConverter>();
 
             builder.Property(h => h.FromUserId)
                 .IsRequired()

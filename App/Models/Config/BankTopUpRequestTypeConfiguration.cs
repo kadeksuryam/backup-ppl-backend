@@ -1,4 +1,5 @@
-﻿using App.Models.Enums;
+﻿using App.Helpers;
+using App.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -31,17 +32,17 @@ namespace App.Models.Config
             builder.Property(r => r.CreatedAt)
                 .IsRequired()
                 .HasColumnName("created_at")
-                .HasConversion<string>();
+                .HasConversion<DateTimeModelConverter>();
 
             builder.Property(r => r.UpdatedAt)
                 .IsRequired()
                 .HasColumnName("updated_at")
-                .HasConversion<string>();
+                .HasConversion<DateTimeModelConverter>();
 
             builder.Property(r => r.ExpiredDate)
                 .IsRequired()
                 .HasColumnName("expired_date")
-                .HasConversion<string>();
+                .HasConversion<DateTimeModelConverter>();
 
             builder.Property(r => r.Amount)
                 .IsRequired()

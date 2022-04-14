@@ -34,7 +34,10 @@ namespace App.Controllers
             }
 
             var response = await _transactionService.CreateTransaction(dto);
-            return Ok(response);
+            return Ok(new SuccessDetails()
+            {
+                Data = response
+            });
         }
 
         [Authorize(Role = "Customer")]
@@ -44,11 +47,17 @@ namespace App.Controllers
             VerifyUserId(userId);
             List<TransactionHistoryResponseDTO> resDTO =
                 await _transactionService.GetTransactionHistoriesByUser(userId);
-            return Ok(resDTO);
+            return Ok(new SuccessDetails()
+            {
+                Data = resDTO
+            });
         }
         private void VerifyUserId(uint userId)
         {
-            uint? currUserId = (uint?)HttpContext.Items["userId"];
+            ParsedToken? parsedToken = HttpContext.Items["userAttr"] as ParsedToken;
+
+
+            uint? currUserId = parsedToken!.userId;
             if (currUserId != userId)
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
@@ -61,7 +70,6 @@ namespace App.Controllers
         {
             return Ok(new SuccessDetails()
             {
-                StatusCode = (int)HttpStatusCode.OK,
                 Data = await _transactionService.GetHistoryTransaction(getAllParameters)
             });
         }
