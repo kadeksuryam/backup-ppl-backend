@@ -1,4 +1,5 @@
 using App.DTOs.Requests;
+﻿using App.Data;
 using App.DTOs.Responses;
 using App.Helpers;
 using App.Models;
@@ -6,6 +7,7 @@ using App.Models.Enums;
 using App.Repositories;
 using App.Services;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -25,33 +27,61 @@ namespace Tests
         private Mock<IVoucherService>? mockVoucherService;
         private CultureInfo? cultureInfo;
         private const DateTimeStyles dateStyles = DateTimeStyles.None;
-        private MapperConfiguration? mapperConfig;
-        private Mapper? mapper;
-        private TopUpService? topUpService;
         private Voucher? mockVoucher;
         private User? mockUser;
         private List<TopUpHistory> mockHistories = new();
 
+        //Mock<IBankTopUpRequestRepository>? mockTopUpReqRepo;
+        //Mock<ITopUpHistoryRepository>? mockTopUpHistoryRepository;
+        DataContext dataContext;
+        //MapperConfiguration? mapperConfig;
+        Mapper? mapper;
+        TopUpService? topUpService;
+        DbContextOptions<DataContext> options = new DbContextOptionsBuilder<DataContext>().Options;
+
         private void Initialize()
         {
-            mockBankRequestRepo = new Mock<IBankTopUpRequestRepository>();
+            InitializeRepositories();
+            InitializeMapper();
+            InitializeServices();
+        }
+
+        private void InitializeRepositories()
+        {
+            mockBankRepo = new();
+            mockBankRequestRepo = new();
+            mockUserRepo = new();
+            mockHistoryRepo = new();
+        }
+
+        private void InitializeMapper()
+        {
             AutoMapperProfile mapperProfile = new();
             cultureInfo = mapperProfile.GetCultureInfo();
-            mapperConfig = new MapperConfiguration(cfg =>
+
+            MapperConfiguration mapperConfig = new(cfg =>
             {
                 cfg.AddProfile(mapperProfile);
             });
-            mapper = new Mapper(mapperConfig);
-            mockBankRepo = new();
-            mockUserRepo = new();
-            mockHistoryRepo = new();
-            mockVoucherService = new Mock<IVoucherService>();
+           
 
-            topUpService = new TopUpService(mockBankRepo.Object,
-                mockBankRequestRepo.Object,
-                mockUserRepo.Object, mockHistoryRepo.Object,
-                mockVoucherService.Object, mapper);
+            mapper = new Mapper(mapperConfig);
         }
+
+        private void InitializeServices()
+        {
+            dataContext = new DataContext(options);
+            mockVoucherService = new Mock<IVoucherService>();
+            topUpService = new TopUpService(
+                mockBankRepo!.Object,
+                mockBankRequestRepo!.Object,
+                mockUserRepo!.Object,
+                mockHistoryRepo!.Object,
+                mockVoucherService.Object,
+                mapper!,
+                dataContext);
+        }
+
         private uint GetAuthenticatedUserId()
         {
             uint userId = 1234;

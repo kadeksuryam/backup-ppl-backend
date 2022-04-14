@@ -32,5 +32,21 @@ namespace App.Repositories
                 .Include(b => b.From)
                 .ToListAsync();
         }
+
+        public async Task<BankTopUpRequest> Update(BankTopUpRequest entity)
+        {
+            _context.BankTopUpRequests.Update(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
+
+        public async Task<BankTopUpRequest?> Get(uint id)
+        {
+            return await _context.BankTopUpRequests
+                .Where(b => b.Id == id)
+                .Include(b => b.Bank)
+                .Include(b => b.From)
+                .FirstAsync(); 
+        }
     }
 }

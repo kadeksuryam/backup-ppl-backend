@@ -1,4 +1,5 @@
-﻿using App.DTOs.Requests;
+﻿using App.Data;
+using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Helpers;
 using App.Models;
@@ -6,35 +7,40 @@ using App.Models.Enums;
 using App.Repositories;
 using AutoMapper;
 using System.Net;
+using static App.DTOs.Responses.GetTopUpHistoryResponseDTO;
 
 namespace App.Services
 {
     public class TopUpService : ITopUpService
     {
-        private readonly IBankRepository _bankRepo;
-        private readonly IBankTopUpRequestRepository _bankRequestRepo;
-        private readonly IUserRepository _userRepo;
-        private readonly ITopUpHistoryRepository _historyRepo;
+        private readonly IBankRepository _bankRepository;
+        private readonly IBankTopUpRequestRepository _bankTopUpRequestRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ITopUpHistoryRepository _topUpHistoryRepository;
         private readonly IVoucherService _voucherService;
         private readonly IMapper _mapper;
-
+        private readonly DataContext _dataContext;
         private Bank? SelectedBank;
 
-        public TopUpService(IBankRepository bankRepo, IBankTopUpRequestRepository bankRequestRepo,
-            IUserRepository userRepo, ITopUpHistoryRepository historyRepo,
-            IVoucherService voucherService, IMapper mapper)
+        public TopUpService(IBankRepository bankRepository,
+            IBankTopUpRequestRepository bankTopUpRequestRepository,
+            IUserRepository userRepository,
+            ITopUpHistoryRepository topUpHistoryRepository,
+            IVoucherService voucherService,
+            IMapper mapper, DataContext context)
         {
-            _bankRepo = bankRepo;
-            _bankRequestRepo = bankRequestRepo;
-            _userRepo = userRepo;
-            _historyRepo = historyRepo;
+            _bankRepository = bankRepository;
+            _bankTopUpRequestRepository = bankTopUpRequestRepository;
             _voucherService = voucherService;
+            _userRepository = userRepository;
             _mapper = mapper;
+            _topUpHistoryRepository = topUpHistoryRepository;
+            _dataContext = context;
         }
 
         public async Task<BankTopUpResponseDTO> BankTopUp(BankTopUpRequestDTO requestDto)
         {
-            SelectedBank = await _bankRepo.GetById(requestDto.BankId);
+            SelectedBank = await _bankRepository.GetById(requestDto.BankId);
             if (SelectedBank == null)
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "Bank ID is not valid.");
@@ -48,7 +54,7 @@ namespace App.Services
         private async Task<BankTopUpResponseDTO> ExecuteBankTopUpRequestCreation(BankTopUpRequestDTO requestDto)
         {
             BankTopUpRequest topUpRequest = CreateBankTopUpRequest(requestDto);
-            await _bankRequestRepo.Add(topUpRequest);
+            await _bankTopUpRequestRepository.Add(topUpRequest);
             return CreateBankTopUpRequestDTO(topUpRequest);
         }
 
@@ -71,7 +77,7 @@ namespace App.Services
 
         public async Task<List<GetBankTopUpRequestResponseDTO>> GetBankTopUpRequest(RequestStatus? requestStatus)
         {
-            IEnumerable<BankTopUpRequest> requests = await _bankRequestRepo.GetAll(requestStatus);
+            IEnumerable<BankTopUpRequest> requests = await _bankTopUpRequestRepository.GetAll(requestStatus);
             List<GetBankTopUpRequestResponseDTO> response = new List<GetBankTopUpRequestResponseDTO>();
 
             foreach (var request in requests)
@@ -91,12 +97,11 @@ namespace App.Services
             }
             return response;
         }
-
         public async Task<VoucherTopUpResponseDTO> VoucherTopUp(VoucherTopUpRequestDTO request)
         {
             Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode);
 
-            User? user = await _userRepo.GetById(request.UserId);
+            User? user = await _userRepository.GetById(request.UserId);
             user!.Balance += voucher.Amount;
 
             TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
@@ -104,15 +109,15 @@ namespace App.Services
 
             VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
 
-            await _historyRepo.Add(history);
-            await _userRepo.Update(user);
+            await _topUpHistoryRepository.Add(history);
+            await _userRepository.Update(user);
 
             return response;
         }
 
         public async Task<List<TopUpHistoryResponseDTO>> GetTopUpHistoriesByUser(uint userId)
         {
-            IEnumerable<TopUpHistory> histories = await _historyRepo.GetAllByUserId(userId);
+            IEnumerable<TopUpHistory> histories = await _topUpHistoryRepository.GetAllByUserId(userId);
             histories = histories.OrderByDescending(history => history.UpdatedAt);
 
             List<TopUpHistoryResponseDTO> responses = new();
@@ -122,6 +127,115 @@ namespace App.Services
             }
 
             return responses;
+        }
+
+        public async Task UpdateBankTopUpRequest(UpdateTopUpRequestStatusRequestDTO dto)
+        {
+            BankTopUpRequest? bankTopUpRequest = (await _bankTopUpRequestRepository.Get(dto.Id));
+            RequestStatus? requestStatus = (RequestStatus?)Enum.Parse(typeof(RequestStatus), dto.Status!);
+            User? userDb = bankTopUpRequest != null ? bankTopUpRequest!.From : null;
+            Bank? bankDb = bankTopUpRequest != null ? bankTopUpRequest!.Bank : null;
+
+            if (bankTopUpRequest == null)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid TopUp Request Id");
+            }
+            if (!bankTopUpRequest.Status.Equals(RequestStatus.Pending))
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid request status");
+            }
+
+            using var transaction = _dataContext.Database.BeginTransaction();
+            if (bankTopUpRequest.ExpiredDate.ToUniversalTime() < DateTime.UtcNow)
+            {
+                try
+                {
+                    bankTopUpRequest.Status = RequestStatus.Failed;
+                    bankTopUpRequest.UpdatedAt = DateTime.UtcNow;
+                    await _bankTopUpRequestRepository.Update(bankTopUpRequest);
+
+                    _dataContext.SaveChanges();
+                    transaction.Commit();
+                }
+                catch (Exception ex)
+                {
+                    transaction.Rollback();
+                    throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, ex.Message);
+                }
+                throw new HttpStatusCodeException(HttpStatusCode.UnprocessableEntity, "TopUp Request Expired");
+            }
+
+            try
+            {
+
+                bankTopUpRequest.Status = requestStatus;
+                bankTopUpRequest.UpdatedAt = DateTime.UtcNow;
+                if (requestStatus.Equals(RequestStatus.Success))
+                {
+                    userDb!.Balance += (uint)bankTopUpRequest.Amount;
+                    // increase the EXP?
+                    userDb!.Exp += 100;
+                }
+                TopUpHistory topUpHistory = new()
+                {
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    Amount = bankTopUpRequest.Amount,
+                    Method = TopUpHistory.TopUpMethod.Bank,
+                    FromUserId = userDb!.Id,
+                    BankRequestId = bankDb!.Id,
+                    VoucherId = null
+                };
+                await _topUpHistoryRepository.Add(topUpHistory);
+                await _bankTopUpRequestRepository.Update(bankTopUpRequest);
+                await _userRepository.Update(userDb);
+
+                _dataContext.SaveChanges();
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, ex.Message);
+            }
+
+        }
+
+        public async Task<GetTopUpHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam)
+        {
+
+            GetTopUpHistoryResponseDTO res = new GetTopUpHistoryResponseDTO();
+            res.TopUpHistories = new List<TopUpHistoryDTO>();
+
+            PagedList<TopUpHistory> histories = await _topUpHistoryRepository.GetAll(getAllParam);
+
+
+
+            foreach (var history in histories)
+            {
+                Console.WriteLine(history.BankRequest != null);
+                TopUpHistoryDTO dto = new TopUpHistoryDTO()
+                {
+                    Id = history.Id,
+                    CreatedAt = history.CreatedAt.ToString("o"),
+                    UpdatedAt = history.CreatedAt.ToString("o"),
+                    From = _mapper.Map<UserDTO>(history.From),
+                    Amount = (uint)history.Amount,
+                    Method = history.Method.ToString(),
+                    Voucher = _mapper.Map<VoucherDTO>(history.Voucher),
+                    Bank = history.BankRequest != null ? _mapper.Map<BankDTO>(history.BankRequest.Bank) : null
+                };
+                res.TopUpHistories.Add(dto);
+            }
+
+            res.Paging = new PagingDTO()
+            {
+                page = histories.CurrentPage,
+                size = histories.PageSize,
+                count = histories.Count,
+            };
+
+            return res;
         }
     }
 }

@@ -25,5 +25,16 @@ namespace App.Repositories
                 .Where(history => history.FromUserId == userId)
                 .ToListAsync();
         }
+
+        public async Task<PagedList<TopUpHistory>> GetAll(PagingParameters getAllParameters)
+        {
+            return await PagedList<TopUpHistory>.ToPagedListAsync(
+                _context.TopUpHistories
+                .Include(b => b.From)
+                .Include(b => b.BankRequest)
+                .Include(b => b.BankRequest != null ? b.BankRequest.Bank : null)
+                .Include(b => b.Voucher)
+                .OrderBy(b => b.Id), getAllParameters);
+        }
     }
 }

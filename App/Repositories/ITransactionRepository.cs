@@ -9,5 +9,6 @@ namespace App.Repositories
         Task<TransactionHistory?> Delete(int id);
         Task<TransactionHistory?> Get(int id);
         Task<IEnumerable<TransactionHistory>> GetAllByUserId(uint userId);
+        Task<PagedList<TransactionHistory>> GetAll(PagingParameters getAllParameters);
     }
 }

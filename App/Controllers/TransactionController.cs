@@ -2,6 +2,7 @@
 using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Helpers;
+using App.Models;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -52,6 +53,17 @@ namespace App.Controllers
             {
                 throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
             }
+        }
+
+        [Authorize(Role = "Admin")]
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistoryTransactions([FromQuery] PagingParameters getAllParameters)
+        {
+            return Ok(new SuccessDetails()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = await _transactionService.GetHistoryTransaction(getAllParameters)
+            });
         }
     }
 }

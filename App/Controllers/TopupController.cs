@@ -2,6 +2,7 @@
 using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Helpers;
+using App.Models;
 using App.Models.Enums;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -71,6 +72,36 @@ namespace App.Controllers
             VerifyUserId(userId);
             List<TopUpHistoryResponseDTO> resDTO = await _topUpService.GetTopUpHistoriesByUser(userId);
             return Ok(resDTO);
+        }
+
+        [Authorize(Role = "Admin")]
+        [HttpPatch("requests")]
+        public async Task<IActionResult> UpdateRequestTopUp([FromBody] UpdateTopUpRequestStatusRequestDTO dto)
+        {
+            if (!Enum.TryParse(dto.Status, out RequestStatus requestStatus))
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid request status");
+            };
+
+            await _topUpService.UpdateBankTopUpRequest(dto);
+
+            return Ok(new SuccessDetails()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = new { message = "Given TopUp Request has been successfully updated" }
+            });
+        }
+
+        [Authorize(Role = "Admin")]
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistoryTopUps([FromQuery] PagingParameters getAllParameters)
+        {
+            return Ok(new SuccessDetails()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = await _topUpService.GetHistoryTransaction(getAllParameters)
+            });
+
         }
     }
 }

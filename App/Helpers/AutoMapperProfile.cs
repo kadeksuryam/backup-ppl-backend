@@ -80,6 +80,11 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.Status, opt => opt.MapFrom(src =>
                         src.Status.ToString()));
+
+            CreateMap<User, GetTransactionHistoryResponseDTO.UserDTO>();
+            CreateMap<User, GetTopUpHistoryResponseDTO.UserDTO>();
+            CreateMap<Voucher, GetTopUpHistoryResponseDTO.VoucherDTO>();
+            CreateMap<Bank, GetTopUpHistoryResponseDTO.BankDTO>();
         }
 
         private static string ToDateString(DateTime date)
