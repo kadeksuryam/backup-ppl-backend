@@ -57,7 +57,7 @@ namespace App.Services
 
         private async Task<BankTopUpResponseDTO> ExecuteBankTopUpRequestCreation(BankTopUpRequestDTO requestDto)
         {
-            using (IDbContextTransaction t = _dataContext.BeginTransaction())
+            using (IDbContextTransactionProxy t = _dataContext.BeginTransaction())
             {
                 try
                 {
@@ -121,7 +121,7 @@ namespace App.Services
         }
         public async Task<VoucherTopUpResponseDTO> VoucherTopUp(VoucherTopUpRequestDTO request)
         {
-            using (IDbContextTransaction t = _dataContext.BeginTransaction())
+            using (IDbContextTransactionProxy t = _dataContext.BeginTransaction())
             {
                 try
                 {
@@ -135,10 +135,10 @@ namespace App.Services
 
                     VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
 
-                    TopUpHistory result = await _topUpHistoryRepository.Add(history);
+                    await _topUpHistoryRepository.Add(history);
                     await _userRepository.Update(user);
 
-                    await _userService.AddExp(user, (uint)result.Amount / 5000);
+                    await _userService.AddExp(user, (uint)history.Amount / 5000);
 
                     t.Commit();
 

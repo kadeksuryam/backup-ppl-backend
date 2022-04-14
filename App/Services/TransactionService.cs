@@ -60,7 +60,7 @@ namespace App.Services
             transaction.UpdatedAt = dateTime;
             transaction.Status = TransactionHistory.TransactionStatus.Success;
 
-            using (IDbContextTransaction t = _context.BeginTransaction())
+            using (IDbContextTransactionProxy t = _context.BeginTransaction())
             {
                 try
                 {
