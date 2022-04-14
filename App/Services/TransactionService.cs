@@ -1,5 +1,4 @@
-﻿using App.Authorization;
-using App.Data;
+﻿using App.Data;
 using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Helpers;
@@ -18,7 +17,7 @@ namespace App.Services
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        public TransactionService(IDataContext context, ITransactionRepository transactionRepository, 
+        public TransactionService(IDataContext context, ITransactionRepository transactionRepository,
             IUserRepository userRepository, IMapper mapper)
         {
             _context = context;
@@ -83,13 +82,27 @@ namespace App.Services
                     t.Commit();
 
                     return response;
-                } 
+                }
                 catch (Exception)
                 {
                     t.Rollback();
                     throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, "An error occured");
                 }
             }
+        }
+
+        public async Task<List<TransactionHistoryResponseDTO>> GetTransactionHistoriesByUser(uint userId)
+        {
+            IEnumerable<TransactionHistory> histories = await _transactionRepository.GetAllByUserId(userId);
+            histories = histories.OrderByDescending(history => history.UpdatedAt);
+
+            List<TransactionHistoryResponseDTO> responses = new();
+            foreach (TransactionHistory history in histories)
+            {
+                responses.Add(_mapper.Map<TransactionHistoryResponseDTO>(history));
+            }
+
+            return responses;
         }
 
         public async Task<GetTransactionHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam)
@@ -100,7 +113,7 @@ namespace App.Services
 
             PagedList<TransactionHistory> histories = await _transactionRepository.GetAll(getAllParam);
 
-            
+
 
             foreach (var history in histories)
             {

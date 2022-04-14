@@ -1,7 +1,7 @@
 ﻿
 using System.ComponentModel.DataAnnotations;
 
-namespace App.Services
+namespace App.Helpers.FormatValidator
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
     public class DisplayNameAttribute : ValidationAttribute

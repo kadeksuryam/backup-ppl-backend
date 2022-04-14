@@ -12,6 +12,18 @@ namespace App.Repositories
         {
             _context = context;
         }
+        public async Task<BankTopUpRequest> Add(BankTopUpRequest request)
+        {
+            _context.BankTopUpRequests.Add(request);
+            await _context.SaveChangesAsync();
+            return request;
+        }
+
+        public Task<IEnumerable<BankTopUpRequest>> GetAllPending()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<IEnumerable<BankTopUpRequest>> GetAll(RequestStatus? requestStatus)
         {
             return await _context.BankTopUpRequests

@@ -1,10 +1,9 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace App.Helpers.FormatValidator
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
-    public class PasswordAttribute : ValidationAttribute
+    public class AmountAttribute : ValidationAttribute
     {
         public override bool IsValid(object? value)
         {
@@ -12,9 +11,13 @@ namespace App.Helpers.FormatValidator
             {
                 return false;
             }
+            else if (int.TryParse(value.ToString(), out int intValue))
+            {
+                return intValue > 0;
+            }
             else
             {
-                return value.ToString() != "";
+                return false;
             }
         }
     }

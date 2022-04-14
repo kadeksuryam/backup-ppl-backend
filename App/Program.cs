@@ -37,11 +37,13 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<ITopUpHistoryRepository, TopUpHistoryRepository>();
     services.AddScoped<IBankTopUpRequestRepository, BankTopUpRequestRepository>();
     services.AddScoped<IVoucherRepository, VoucherRepository>();
+    services.AddScoped<ITopUpHistoryRepository, TopUpHistoryRepository>();
     services.AddScoped<ITransactionRepository, TransactionRepository>();
     services.AddScoped<IVoucherService, VoucherService>();
     services.AddScoped<ITopUpService, TopUpService>();
     services.AddScoped<ITransactionService, TransactionService>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<ITopUpService, TopUpService>();
     services.AddScoped<IBcryptWrapper, BcryptWrapper>();
     services.AddAutoMapper(typeof(Program));
 
