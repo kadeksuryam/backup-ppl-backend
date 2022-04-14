@@ -507,3 +507,4 @@ terraform.rc
 
 *.vscode
 *.env
+Migrations/
