@@ -18,3 +18,5 @@ deploy:
   stage: deploy
   script:
     - ssh -o StrictHostKeyChecking=no -i ~/.ssh/azurevmkey.pem $SERVER_ADDRESS "cd if3250_2022_35_cakrawala_backend; sudo docker-compose down; git pull --rebase origin main; sudo docker-compose up --build -d; exit;"
+  only:
+    - main
