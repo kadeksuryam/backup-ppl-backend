@@ -18,13 +18,9 @@ namespace App.Services
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
-<<<<<<< HEAD
+
         public TransactionService(IDataContext context, ITransactionRepository transactionRepository, 
             IUserRepository userRepository, IUserService userService, IMapper mapper)
-=======
-        public TransactionService(IDataContext context, ITransactionRepository transactionRepository,
-            IUserRepository userRepository, IMapper mapper)
->>>>>>> main
         {
             _context = context;
             _transactionRepository = transactionRepository;

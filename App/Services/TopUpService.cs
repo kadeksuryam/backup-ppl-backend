@@ -6,6 +6,7 @@ using App.Models;
 using App.Models.Enums;
 using App.Repositories;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore.Storage;
 using System.Net;
 using static App.DTOs.Responses.GetTopUpHistoryResponseDTO;
 
@@ -16,6 +17,7 @@ namespace App.Services
         private readonly IBankRepository _bankRepository;
         private readonly IBankTopUpRequestRepository _bankTopUpRequestRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly ITopUpHistoryRepository _topUpHistoryRepository;
         private readonly IVoucherService _voucherService;
         private readonly IMapper _mapper;
@@ -25,6 +27,7 @@ namespace App.Services
         public TopUpService(IBankRepository bankRepository,
             IBankTopUpRequestRepository bankTopUpRequestRepository,
             IUserRepository userRepository,
+            IUserService userService,
             ITopUpHistoryRepository topUpHistoryRepository,
             IVoucherService voucherService,
             IMapper mapper, DataContext context)
@@ -32,6 +35,7 @@ namespace App.Services
             _bankRepository = bankRepository;
             _bankTopUpRequestRepository = bankTopUpRequestRepository;
             _voucherService = voucherService;
+            _userService = userService;
             _userRepository = userRepository;
             _mapper = mapper;
             _topUpHistoryRepository = topUpHistoryRepository;
@@ -53,9 +57,27 @@ namespace App.Services
 
         private async Task<BankTopUpResponseDTO> ExecuteBankTopUpRequestCreation(BankTopUpRequestDTO requestDto)
         {
-            BankTopUpRequest topUpRequest = CreateBankTopUpRequest(requestDto);
-            await _bankTopUpRequestRepository.Add(topUpRequest);
-            return CreateBankTopUpRequestDTO(topUpRequest);
+            using (IDbContextTransaction t = _dataContext.BeginTransaction())
+            {
+                try
+                {
+                    BankTopUpRequest topUpRequest = CreateBankTopUpRequest(requestDto);
+                    await _bankTopUpRequestRepository.Add(topUpRequest);
+
+                    var user = await _userRepository.GetById(requestDto.UserId);
+                    await _userService.AddExp(user!, (uint)requestDto.Amount / 5000);
+
+                    t.Commit();
+
+                    return CreateBankTopUpRequestDTO(topUpRequest);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    t.Rollback();
+                    throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, "An error occured");
+                }
+            }
         }
 
         private BankTopUpResponseDTO CreateBankTopUpRequestDTO(BankTopUpRequest topUpRequest)
@@ -99,20 +121,36 @@ namespace App.Services
         }
         public async Task<VoucherTopUpResponseDTO> VoucherTopUp(VoucherTopUpRequestDTO request)
         {
-            Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode);
+            using (IDbContextTransaction t = _dataContext.BeginTransaction())
+            {
+                try
+                {
+                    Voucher voucher = await _voucherService!.UseVoucher(request.VoucherCode);
 
-            User? user = await _userRepository.GetById(request.UserId);
-            user!.Balance += voucher.Amount;
+                    User? user = await _userRepository.GetById(request.UserId);
+                    user!.Balance += voucher.Amount;
 
-            TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
-            history.FromUserId = request.UserId;
+                    TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
+                    history.FromUserId = request.UserId;
 
-            VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
+                    VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
 
-            await _topUpHistoryRepository.Add(history);
-            await _userRepository.Update(user);
+                    TopUpHistory result = await _topUpHistoryRepository.Add(history);
+                    await _userRepository.Update(user);
 
-            return response;
+                    await _userService.AddExp(user, (uint)result.Amount / 5000);
+
+                    t.Commit();
+
+                    return response;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    t.Rollback();
+                    throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, "An error occured");
+                }
+            }
         }
 
         public async Task<List<TopUpHistoryResponseDTO>> GetTopUpHistoriesByUser(uint userId)
