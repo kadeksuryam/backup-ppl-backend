@@ -116,6 +116,15 @@
             return response;
         }
 
+        public async Task<GetDisplayNameResponseDTO> GetDisplayName(string userName)
+        {
+            User? userDb = await _userRepository.GetByUsername(userName);
+            if (userDb == null) throw new HttpStatusCodeException(HttpStatusCode.NotFound, "User not found");
+
+            var response = _mapper.Map<GetDisplayNameResponseDTO>(userDb);
+            return response;
+        }
+
         public HttpStatusCodeException GetUpdateProfileIncorrectOldPasswordException()
         {
             return new HttpStatusCodeException(HttpStatusCode.Unauthorized, "Incorrect old password");
