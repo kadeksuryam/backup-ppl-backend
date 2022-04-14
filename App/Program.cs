@@ -8,17 +8,28 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+{
+    var root = Directory.GetCurrentDirectory();
+    var dotenv = Path.Combine(root, "../.env");
+    DotEnv.Load(dotenv);
+}
+
 // Add services to the DI container.
 {
     var services = builder.Services;
-    // setup prod/dev DB
-
     services.AddCors();
     services.AddControllers();
 
     services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
-    services.AddDbContext<DataContext>(options => options.UseNpgsql(builder.Configuration.GetValue<string>("ConnectionStrings:DefaultConnection")));
+    string? host = Environment.GetEnvironmentVariable("POSTGRES_HOST");
+    string? db = Environment.GetEnvironmentVariable("POSTGRES_DB");
+    string? username = Environment.GetEnvironmentVariable("POSTGRES_USER");
+    string? password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+    string? dbConnectionString = $"Host={host};Database={db};Username={username};Password={password}";
+
+    services.AddDbContext<DataContext>(options => options.UseNpgsql(dbConnectionString));
     services.AddScoped<IDataContext>(provider => provider.GetService<DataContext>());
     services.AddScoped<IUserRepository, UserRepository>();
     services.AddScoped<ILevelRepository, LevelRepository>();

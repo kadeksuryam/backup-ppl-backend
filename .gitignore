@@ -506,3 +506,4 @@ terraform.rc
 *.terraform
 
 *.vscode
+*.env
