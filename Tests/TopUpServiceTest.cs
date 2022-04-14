@@ -23,6 +23,7 @@ namespace Tests
         private Bank? mockBank;
         private Mock<IBankTopUpRequestRepository>? mockBankRequestRepo;
         private Mock<IUserRepository>? mockUserRepo;
+        private Mock<IUserService>? mockUserService;
         private Mock<ITopUpHistoryRepository>? mockHistoryRepo;
         private Mock<IVoucherService>? mockVoucherService;
         private CultureInfo? cultureInfo;
@@ -76,6 +77,7 @@ namespace Tests
                 mockBankRepo!.Object,
                 mockBankRequestRepo!.Object,
                 mockUserRepo!.Object,
+                mockUserService!.Object,
                 mockHistoryRepo!.Object,
                 mockVoucherService.Object,
                 mapper!,
