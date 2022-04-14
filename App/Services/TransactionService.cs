@@ -1,5 +1,4 @@
-﻿using App.Authorization;
-using App.Data;
+﻿using App.Data;
 using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Helpers;
@@ -8,6 +7,7 @@ using App.Repositories;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Net;
+using static App.DTOs.Responses.GetTransactionHistoryResponseDTO;
 
 namespace App.Services
 {
@@ -18,8 +18,13 @@ namespace App.Services
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+<<<<<<< HEAD
         public TransactionService(IDataContext context, ITransactionRepository transactionRepository, 
             IUserRepository userRepository, IUserService userService, IMapper mapper)
+=======
+        public TransactionService(IDataContext context, ITransactionRepository transactionRepository,
+            IUserRepository userRepository, IMapper mapper)
+>>>>>>> main
         {
             _context = context;
             _transactionRepository = transactionRepository;
@@ -95,5 +100,56 @@ namespace App.Services
                 }
             }
         }
+
+        public async Task<List<TransactionHistoryResponseDTO>> GetTransactionHistoriesByUser(uint userId)
+        {
+            IEnumerable<TransactionHistory> histories = await _transactionRepository.GetAllByUserId(userId);
+            histories = histories.OrderByDescending(history => history.UpdatedAt);
+
+            List<TransactionHistoryResponseDTO> responses = new();
+            foreach (TransactionHistory history in histories)
+            {
+                responses.Add(_mapper.Map<TransactionHistoryResponseDTO>(history));
+            }
+
+            return responses;
+        }
+
+        public async Task<GetTransactionHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam)
+        {
+
+            GetTransactionHistoryResponseDTO res = new GetTransactionHistoryResponseDTO();
+            res.TransactionHistories = new List<TransactionHistoryDTO>();
+
+            PagedList<TransactionHistory> histories = await _transactionRepository.GetAll(getAllParam);
+
+
+
+            foreach (var history in histories)
+            {
+                System.Console.WriteLine(history);
+                TransactionHistoryDTO dto = new TransactionHistoryDTO()
+                {
+                    Id = history.Id,
+                    CreatedAt = history.CreatedAt.ToString("o"),
+                    UpdatedAt = history.CreatedAt.ToString("o"),
+                    From = _mapper.Map<UserDTO>(history.From),
+                    To = _mapper.Map<UserDTO>(history.To),
+                    Amount = history.Amount,
+                    Status = history.Status.ToString()
+                };
+                res.TransactionHistories.Add(dto);
+            }
+
+            res.Paging = new PagingDTO()
+            {
+                page = histories.CurrentPage,
+                size = histories.PageSize,
+                count = histories.Count,
+            };
+
+            return res;
+        }
+
     }
 }

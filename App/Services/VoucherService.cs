@@ -47,6 +47,7 @@ namespace App.Services
             }
 
             voucher.IsUsed = true;
+            voucher.UpdatedAt = DateTime.Now;
             Voucher updatedVoucher = await _voucherRepository.Update(voucher);
             return updatedVoucher;
         }

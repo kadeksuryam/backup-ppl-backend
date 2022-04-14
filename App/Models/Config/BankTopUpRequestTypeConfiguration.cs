@@ -11,6 +11,7 @@ namespace App.Models.Config
             ConfigureTable(builder);
             ConfigureAttributes(builder);
             ConfigureRelations(builder);
+            AddSeed(builder);
         }
 
         private static void ConfigureTable(EntityTypeBuilder<BankTopUpRequest> builder)
@@ -75,5 +76,21 @@ namespace App.Models.Config
                 .WithMany(b => b.BankTopUpRequests)
                 .HasForeignKey(r => r.BankId);
         }
+
+        private void AddSeed(EntityTypeBuilder<BankTopUpRequest> builder)
+        {
+            builder.HasData(new BankTopUpRequest
+            {
+                Id = 1,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                ExpiredDate = DateTime.UtcNow.AddDays(1),
+                FromUserId = 1,
+                Amount = 50000,
+                BankId = 1,
+                Status = RequestStatus.Success,
+            });
+        }
+
     }
 }

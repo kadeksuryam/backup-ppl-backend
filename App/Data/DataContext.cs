@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace App.Data
 {
-    public class DataContext: DbContext, IDataContext
+    public class DataContext : DbContext, IDataContext
     {
         public DbSet<User> Users { get; set; }
 

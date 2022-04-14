@@ -1,12 +1,11 @@
 ﻿using App.Authorization;
 using App.DTOs.Requests;
 using App.DTOs.Responses;
-using App.Services;
-using App.Repositories;
-using Microsoft.AspNetCore.Mvc;
 using App.Helpers;
+using App.Models;
+using App.Services;
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Reflection;
 
 namespace App.Controllers
 {
@@ -36,6 +35,35 @@ namespace App.Controllers
 
             var response = await _transactionService.CreateTransaction(dto);
             return Ok(response);
+        }
+
+        [Authorize(Role = "Customer")]
+        [HttpGet("users/{userId}")]
+        public async Task<IActionResult> GetTransactionHistoriesByUser(uint userId)
+        {
+            VerifyUserId(userId);
+            List<TransactionHistoryResponseDTO> resDTO =
+                await _transactionService.GetTransactionHistoriesByUser(userId);
+            return Ok(resDTO);
+        }
+        private void VerifyUserId(uint userId)
+        {
+            uint? currUserId = (uint?)HttpContext.Items["userId"];
+            if (currUserId != userId)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.Forbidden, "User Id not match!");
+            }
+        }
+
+        [Authorize(Role = "Admin")]
+        [HttpGet("history")]
+        public async Task<IActionResult> GetHistoryTransactions([FromQuery] PagingParameters getAllParameters)
+        {
+            return Ok(new SuccessDetails()
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Data = await _transactionService.GetHistoryTransaction(getAllParameters)
+            });
         }
     }
 }
