@@ -1,25 +1,22 @@
 ﻿version: '3.4'
 
 services:
-    postgresql_db:
+    postgresqldb:
         image: postgres:latest
-        environment:
-            - POSTGRES_USER=admin
-            - POSTGRES_PASSWORD=admin1234
-            - POSTGRES_DB=cakrawala_id
+        env_file:
+            - '.env'
         ports:
             - "5432:5432"
         restart: always
         volumes:
             - database-data:/var/lib/postgresql/data/
         networks:
-            - app-network
+            - app-network       
     
     pgadmin:
         image: dpage/pgadmin4
-        environment:
-            - PGADMIN_DEFAULT_EMAIL=pgadmin@pgadmin.org
-            - PGADMIN_DEFAULT_PASSWORD=admin1234
+        env_file:
+            - '.env'
         ports:
             - "5050:80"
         restart: always
@@ -31,12 +28,14 @@ services:
     server:
         build:
             context: ./
+        env_file:
+            - '.env'
         ports:
             - "80:80"
             - "443:443"
         restart: unless-stopped
         links:
-            - postgresql_db
+            - postgresqldb
         networks:
             - app-network
 

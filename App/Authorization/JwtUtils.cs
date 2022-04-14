@@ -10,18 +10,19 @@ namespace App.Authorization
 {
     public class JwtUtils : IJwtUtils
     {
-        private readonly AppSettings _appSettings;
+        string jwtSecret;
 
-        public JwtUtils(IOptions<AppSettings> appSettings)
-        {
-            _appSettings = appSettings.Value;
+        public JwtUtils() {
+            string? envJwtSecret = Environment.GetEnvironmentVariable("JWT_SECRET");
+            jwtSecret = envJwtSecret == null ? "" : envJwtSecret;
         }
+
 
         public string GenerateToken(User user)
         {
             // generate token that is valid for 1 day
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(jwtSecret);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] { new Claim("id", user.Id.ToString()), new Claim("role", user.Role.ToString()) }),
@@ -36,7 +37,7 @@ namespace App.Authorization
         {
             if (token == null) return null;
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(jwtSecret);
             try
             {
                 tokenHandler.ValidateToken(token, new TokenValidationParameters {
