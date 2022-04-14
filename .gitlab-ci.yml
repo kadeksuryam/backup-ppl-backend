@@ -1,10 +1,8 @@
 before_script:
-  # Setup SSH deploy keys
-  - 'which ssh-agent || (sudo apt-get install -qq openssh-client )'
-  - eval $(ssh-agent -s)
-  - ssh-add <(echo "$SSH_PRIVATE_KEY")
+  - rm -rf ~/.ssh
   - mkdir -p ~/.ssh
-  - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  - echo "$SSH_PRIVATE_KEY" | tr -d '\r' >  ~/.ssh/azurevmkey.pem
+  - chmod 400 ~/.ssh/azurevmkey.pem
 
 stages:
   - test
@@ -19,6 +17,4 @@ test:
 deploy:
   stage: deploy
   script:
-    - ssh $SERVER_ADDRESS "cd if3250_2022_35_cakrawala_backend; sudo docker-compose down; git pull --rebase origin main; sudo docker-compose up --build -d; exit;"
-  only:
-    - main
+    - ssh -o StrictHostKeyChecking=no -i ~/.ssh/azurevmkey.pem $SERVER_ADDRESS "cd if3250_2022_35_cakrawala_backend; sudo docker-compose down; git pull --rebase origin main; sudo docker-compose up --build -d; exit;"
