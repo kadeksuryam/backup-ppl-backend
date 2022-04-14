@@ -34,6 +34,7 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.ExpiredDate, opt => opt.MapFrom(src =>
                         ToDateString(src.ExpiredDate)));
+            CreateMap<User, GetDisplayNameResponseDTO>();
 
             CreateMap<User, GetBankTopUpRequestResponseDTO.UserDTO>();
             CreateMap<Bank, GetBankTopUpRequestResponseDTO.BankDTO>();

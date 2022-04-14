@@ -57,6 +57,14 @@ namespace App.Controllers
 
         }
 
+        [HttpGet("check/{userName}")]
+        public async Task<IActionResult> GetDisplayName(string userName)
+        {
+            var response = await _userService.GetDisplayName(userName);
+
+            return Ok(response);
+        }
+
         [HttpPatch("{userId}")]
         public async Task<IActionResult> UpdateProfile(uint userId, [FromBody] UpdateProfileRequestDTO dto)
         {
