@@ -1,4 +1,5 @@
 ﻿using App.Authorization;
+using App.Data;
 using App.DTOs.Requests;
 using App.DTOs.Responses;
 using App.Helpers;
@@ -21,6 +22,7 @@ namespace Tests
         public async void RegisterUser_UsernameTaken_ReturnsException()
         {
             // Arrange
+            var mockDataContext = new Mock<IDataContext>();
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLevelRepo = new Mock<ILevelRepository>();
 
@@ -40,7 +42,7 @@ namespace Tests
             user.UserName = username;
             mockUserRepo.Setup(p => p.GetByUsername(username)).ReturnsAsync((User)user);
 
-            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act & Assert
@@ -57,6 +59,7 @@ namespace Tests
         public async void RegisterUser_ValidData_ReturnsSuccess()
         {
             // Arrange
+            var mockDataContext = new Mock<IDataContext>();
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
@@ -80,7 +83,7 @@ namespace Tests
 
             mockUserRepo.Setup(p => p.GetByUsername(username)).ReturnsAsync((User)null);
 
-            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act
@@ -95,6 +98,7 @@ namespace Tests
         public async void LoginUser_UserNotFound_ReturnsException()
         {
             // Arrange
+            var mockDataContext = new Mock<IDataContext>();
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
@@ -110,7 +114,7 @@ namespace Tests
             dto.Password = "test";
 
             mockUserRepo.Setup(p => p.GetByEmail(dto.Email)).ReturnsAsync((User)null);
-            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                  mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act & Assert
@@ -126,6 +130,7 @@ namespace Tests
         public async void LoginUser_IncorrectPassword_ReturnsException()
         {
             // Arrange
+            var mockDataContext = new Mock<IDataContext>();
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
@@ -145,7 +150,7 @@ namespace Tests
             mockUserRepo.Setup(p => p.GetByEmail(dto.Email)).ReturnsAsync((User)user);
             mockBcryptWrapper.Setup(p => p.isPasswordCorrect(dto.Password, user.EncryptedPassword)).Returns(false);
 
-            var userService = new UserService(mockUserRepo.Object,  mockLevelRepo.Object, mapper,
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object,  mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act & Assert
@@ -162,6 +167,7 @@ namespace Tests
         public async void LoginUser_ValidData_ReturnsSuccess()
         {
             // Arrange
+            var mockDataContext = new Mock<IDataContext>();
             var mockUserRepo = new Mock<IUserRepository>();
             var mockLevelRepo = new Mock<ILevelRepository>();
             var mapperConfig = new MapperConfiguration(cfg =>
@@ -183,7 +189,7 @@ namespace Tests
             mockBcryptWrapper.Setup(p => p.isPasswordCorrect(dto.Password, user.EncryptedPassword)).Returns(true);
             mockJwtUtil.Setup(p => p.GenerateToken(user)).Returns(token);
 
-            var userService = new UserService(mockUserRepo.Object, mockLevelRepo.Object, mapper,
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act
@@ -197,6 +203,7 @@ namespace Tests
         }
 
         /* For update profile */
+        private Mock<IDataContext> _mockDataContext;
         private Mock<IUserRepository>? _mockUserRepoForUpdateProfileTest;
         private Mock<ILevelRepository>? _mockLevelRepo;
         private Mapper? _mapperForUpdateProfileTest;
@@ -313,6 +320,7 @@ namespace Tests
         }
 
         private void InitializeMockAndMapperForUpdateProfileTest() {
+            _mockDataContext = new Mock<IDataContext>();
             _mockUserRepoForUpdateProfileTest = new Mock<IUserRepository>();
             _mapperForUpdateProfileTest = new Mapper(
                 new MapperConfiguration(cfg => {
@@ -375,7 +383,7 @@ namespace Tests
 
         private void InitializeUserServiceForUpdateProfileTest()
         {
-            _userServiceForUpdateProfileTest = new UserService(_mockUserRepoForUpdateProfileTest!.Object, _mockLevelRepo!.Object, _mapperForUpdateProfileTest!,
+            _userServiceForUpdateProfileTest = new UserService(_mockDataContext.Object, _mockUserRepoForUpdateProfileTest!.Object, _mockLevelRepo!.Object, _mapperForUpdateProfileTest!,
                 _mockJwtUtil!.Object, _mockBcryptWrapper!.Object);
         }
     }

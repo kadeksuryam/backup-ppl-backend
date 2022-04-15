@@ -43,7 +43,7 @@ namespace App.Models.Config
             {
                 Id = 2,
                 Name = "Silver",
-                RequiredExp = 100,
+                RequiredExp = 50,
             }, new Level { 
                 Id = 3,
                 Name = "Gold",
@@ -51,15 +51,15 @@ namespace App.Models.Config
             }, new Level {
                 Id = 4,
                 Name = "Platinum",
-                RequiredExp = 300,
+                RequiredExp = 1000,
             }, new Level { 
                 Id = 5,
                 Name = "Diamond",
-                RequiredExp = 400,
+                RequiredExp = 10000,
             }, new Level {
                 Id = 6,
                 Name = "Crazy Rich",
-                RequiredExp = 500,
+                RequiredExp = 45000,
             });
         }
     }

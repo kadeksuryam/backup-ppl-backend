@@ -17,6 +17,7 @@ namespace Tests
     {
         private User mockUser = new();
         private Mock<IUserRepository> mockUserRepo = new();
+        private Mock<IUserService> mockUserService = new();
         private Mock<ITransactionRepository> mockTransactionRepo = new();
         private Mock<IDataContext>? mockDataContext;
         private CultureInfo? cultureInfo;
@@ -38,6 +39,7 @@ namespace Tests
         private void InitializeRepositoriesAndServices()
         {
             mockUserRepo = new();
+            mockUserService = new();
             mockTransactionRepo = new();
             mockDataContext = new();
             AutoMapperProfile mapperProfile = new();
@@ -49,7 +51,7 @@ namespace Tests
             mapper = new Mapper(mapperConfig);
 
             service = new TransactionService(mockDataContext.Object,
-                mockTransactionRepo.Object, mockUserRepo.Object, mapper);
+                mockTransactionRepo.Object, mockUserRepo.Object, mockUserService.Object, mapper);
         }
 
         private uint GetAuthenticatedUserId()

@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Xunit;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Tests
 {
@@ -23,6 +24,7 @@ namespace Tests
         private Bank? mockBank;
         private Mock<IBankTopUpRequestRepository>? mockBankRequestRepo;
         private Mock<IUserRepository>? mockUserRepo;
+        private Mock<IUserService>? mockUserService;
         private Mock<ITopUpHistoryRepository>? mockHistoryRepo;
         private Mock<IVoucherService>? mockVoucherService;
         private CultureInfo? cultureInfo;
@@ -33,7 +35,7 @@ namespace Tests
 
         //Mock<IBankTopUpRequestRepository>? mockTopUpReqRepo;
         //Mock<ITopUpHistoryRepository>? mockTopUpHistoryRepository;
-        DataContext dataContext;
+        Mock<DataContext> dataContext;
         //MapperConfiguration? mapperConfig;
         Mapper? mapper;
         TopUpService? topUpService;
@@ -43,6 +45,7 @@ namespace Tests
         {
             InitializeRepositories();
             InitializeMapper();
+            InitializeTransactions();
             InitializeServices();
         }
 
@@ -51,6 +54,7 @@ namespace Tests
             mockBankRepo = new();
             mockBankRequestRepo = new();
             mockUserRepo = new();
+            mockUserService = new();
             mockHistoryRepo = new();
         }
 
@@ -67,18 +71,26 @@ namespace Tests
             mapper = new Mapper(mapperConfig);
         }
 
+        private void InitializeTransactions()
+        {
+            dataContext = new Mock<DataContext>(options);
+            var mockTransaction = new Mock<IDbContextTransactionProxy>();
+            dataContext.Setup(x => x.BeginTransaction()).Returns(mockTransaction.Object);
+        }
+
         private void InitializeServices()
         {
-            dataContext = new DataContext(options);
+            mockUserService = new Mock<IUserService>();
             mockVoucherService = new Mock<IVoucherService>();
             topUpService = new TopUpService(
                 mockBankRepo!.Object,
                 mockBankRequestRepo!.Object,
                 mockUserRepo!.Object,
+                mockUserService!.Object,
                 mockHistoryRepo!.Object,
                 mockVoucherService.Object,
                 mapper!,
-                dataContext);
+                dataContext!.Object);
         }
 
         private uint GetAuthenticatedUserId()

@@ -13,7 +13,7 @@ namespace App.Data
         DbSet<TransactionHistory> TransactionHistories { get; set; }
         DbSet<Bank> Banks { get; set; }
         DbSet<Voucher> Vouchers { get; set; }
-        IDbContextTransaction BeginTransaction();
+        IDbContextTransactionProxy BeginTransaction();
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

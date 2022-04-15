@@ -28,12 +28,10 @@ namespace App.Data
         {
             optionsBuilder.EnableSensitiveDataLogging();
         }
-
-        public IDbContextTransaction BeginTransaction()
+        public virtual IDbContextTransactionProxy BeginTransaction()
         {
-            return this.Database.BeginTransaction();
+            return new DbContextTransactionProxy(this);
         }
-
         #region Required
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

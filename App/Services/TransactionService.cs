@@ -16,13 +16,16 @@ namespace App.Services
         private readonly IDataContext _context;
         private readonly ITransactionRepository _transactionRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
-        public TransactionService(IDataContext context, ITransactionRepository transactionRepository,
-            IUserRepository userRepository, IMapper mapper)
+
+        public TransactionService(IDataContext context, ITransactionRepository transactionRepository, 
+            IUserRepository userRepository, IUserService userService, IMapper mapper)
         {
             _context = context;
             _transactionRepository = transactionRepository;
             _userRepository = userRepository;
+            _userService = userService;
             _mapper = mapper;
         }
 
@@ -57,7 +60,7 @@ namespace App.Services
             transaction.UpdatedAt = dateTime;
             transaction.Status = TransactionHistory.TransactionStatus.Success;
 
-            using (IDbContextTransaction t = _context.BeginTransaction())
+            using (IDbContextTransactionProxy t = _context.BeginTransaction())
             {
                 try
                 {
@@ -79,12 +82,15 @@ namespace App.Services
                     await _userRepository.Update(targetUser);
                     await _userRepository.Update(user);
 
+                    await _userService.AddExp(user, dto.Amount / 10000);
+
                     t.Commit();
 
                     return response;
-                }
-                catch (Exception)
+                } 
+                catch (Exception e)
                 {
+                    Console.WriteLine(e);
                     t.Rollback();
                     throw new HttpStatusCodeException(HttpStatusCode.InternalServerError, "An error occured");
                 }
