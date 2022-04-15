@@ -508,3 +508,4 @@ terraform.rc
 *.vscode
 *.env
 Migrations/
+certbot/
