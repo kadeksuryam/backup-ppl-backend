@@ -171,8 +171,7 @@ namespace App.Services
         {
             BankTopUpRequest? bankTopUpRequest = (await _bankTopUpRequestRepository.Get(dto.Id));
             RequestStatus? requestStatus = (RequestStatus?)Enum.Parse(typeof(RequestStatus), dto.Status!);
-            User? userDb = bankTopUpRequest != null ? bankTopUpRequest!.From : null;
-            Bank? bankDb = bankTopUpRequest != null ? bankTopUpRequest!.Bank : null;
+            User? userDb = bankTopUpRequest != null ? bankTopUpRequest.From : null;
 
             if (bankTopUpRequest == null)
             {
@@ -184,7 +183,7 @@ namespace App.Services
             }
 
             using var transaction = _dataContext.Database.BeginTransaction();
-            if (bankTopUpRequest.ExpiredDate.ToUniversalTime() < DateTime.UtcNow)
+            if (bankTopUpRequest.ExpiredDate < DateTime.UtcNow)
             {
                 try
                 {
@@ -221,7 +220,7 @@ namespace App.Services
                     Amount = bankTopUpRequest.Amount,
                     Method = TopUpHistory.TopUpMethod.Bank,
                     FromUserId = userDb!.Id,
-                    BankRequestId = bankDb!.Id,
+                    BankRequestId = dto.Id,
                     VoucherId = null
                 };
                 await _topUpHistoryRepository.Add(topUpHistory);
