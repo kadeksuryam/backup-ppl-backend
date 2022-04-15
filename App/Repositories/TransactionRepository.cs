@@ -46,7 +46,7 @@ namespace App.Repositories
         public async Task<IEnumerable<TransactionHistory>> GetAllByUserId(uint userId)
         {
             return await _context.TransactionHistories
-                .Where(history => history.FromUserId == userId)
+                .Where(history => history.FromUserId == userId || history.ToUserId == userId)
                 .ToListAsync();
         }
 

@@ -16,6 +16,9 @@ namespace App.DTOs.Responses
         [JsonConverter(typeof(DateTimeJSONConverter))]
         public DateTime UpdatedAt { get; set; }
 
+        [JsonPropertyName("sender_user_id")]
+        public uint FromUserId { get; set; }
+
         [JsonPropertyName("receiver_user_id")]
         public uint ToUserId { get; set; }
 
