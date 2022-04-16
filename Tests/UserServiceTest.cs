@@ -202,6 +202,58 @@ namespace Tests
             mockJwtUtil.Verify(p => p.GenerateToken(user), Times.Once());
         }
 
+        [Fact]
+        public async void GetProfile_ValidData_ReturnsSuccess()
+        {
+            // Arrange
+            var mockDataContext = new Mock<IDataContext>();
+            var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperProfile());
+            });
+            var mapper = new Mapper(mapperConfig);
+            var mockJwtUtil = new Mock<IJwtUtils>();
+            var mockBcryptWrapper = new Mock<IBcryptWrapper>();
+
+            User user = new User()
+            {
+                Id = 1,
+                UserName = "test_username",
+                Email = "test_email@email.com",
+                DisplayName = "Test Name",
+                Balance = 10000,
+                Exp = 10,
+                LevelId = 1,
+                EncryptedPassword = "testEncrypt",
+                Type = User.LoginType.Standard,
+                Role = User.UserRole.Customer
+            };
+            Level level = new Level()
+            {
+                Id = 1,
+                Name = "Bronze",
+                RequiredExp = 0
+            };
+
+            mockUserRepo.Setup(p => p.GetById(user.Id)).ReturnsAsync((User)user);
+            mockLevelRepo.Setup(p => p.GetById(user.LevelId)).ReturnsAsync((Level)level);
+
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
+                mockJwtUtil.Object, mockBcryptWrapper.Object);
+
+            // Act
+            GetProfileResponseDTO resDTO = await userService.GetProfile(1);
+
+            // Assert
+            mockUserRepo.Verify(p => p.GetById(user.Id), Times.Once());
+            Assert.Equal(user.Id.ToString(), resDTO.Id.ToString());
+            Assert.Equal(user.UserName.ToString(), resDTO.UserName.ToString());
+            Assert.Equal(user.Email.ToString(), resDTO.Email.ToString());
+            Assert.Equal("Bronze", resDTO.Level.ToString());
+        }
+
         /* For update profile */
         private Mock<IDataContext> _mockDataContext;
         private Mock<IUserRepository>? _mockUserRepoForUpdateProfileTest;
