@@ -77,11 +77,12 @@ namespace Tests
             return userId;
         }
 
-        private void MakeUserIdAuthenticated(uint userId, uint balance = 0)
+        private void MakeUserIdAuthenticated(uint userId, uint balance = 0, uint exp = 0)
         {
             mockUser = new();
             mockUser.Id = userId;
             mockUser.Balance = balance;
+            mockUser.Exp = exp;
             mockUserRepo!.Setup(repo => repo.GetById(userId)).ReturnsAsync(mockUser);
         }
 
@@ -128,6 +129,7 @@ namespace Tests
             CreateTransactionResponseDTO response = await CreateTransaction(request);
             AssertValidCreateTransactionResponse(response);
             AssertExactlyOneCreateTransactionRequestAdded();
+            AssertExactlyOneAddExpRequestAdded();
         }
 
         [Fact]
@@ -198,6 +200,14 @@ namespace Tests
         {
             mockTransactionRepo!.Verify(
                 repo => repo.Add(It.IsAny<TransactionHistory>()),
+                Times.Once
+            );
+        }
+
+        private void AssertExactlyOneAddExpRequestAdded()
+        {
+            mockUserService!.Verify(
+                s => s.AddExp(It.IsAny<User>(), It.Is<uint>(i => i > 0)),
                 Times.Once
             );
         }
