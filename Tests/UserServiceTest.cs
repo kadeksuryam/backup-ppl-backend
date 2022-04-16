@@ -342,6 +342,44 @@ namespace Tests
             Assert.Equal(user.DisplayName.ToString(), resDTO.DisplayName.ToString());
         }
 
+        [Fact]
+        public async void GetDisplayName_InvalidData()
+        {
+            // Arrange
+            var mockDataContext = new Mock<IDataContext>();
+            var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperProfile());
+            });
+            var mapper = new Mapper(mapperConfig);
+            var mockJwtUtil = new Mock<IJwtUtils>();
+            var mockBcryptWrapper = new Mock<IBcryptWrapper>();
+
+            User user = new User()
+            {
+                Id = 1,
+                UserName = "test_username",
+                Email = "test_email@email.com",
+                DisplayName = "Test Name",
+                Balance = 10000,
+                Exp = 10,
+                LevelId = 1,
+                EncryptedPassword = "testEncrypt",
+                Type = User.LoginType.Standard,
+                Role = User.UserRole.Customer
+            };
+
+            mockUserRepo.Setup(p => p.GetByUsername(user.UserName)).ReturnsAsync((User)user);
+
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
+                mockJwtUtil.Object, mockBcryptWrapper.Object);
+
+            // Act
+            HttpStatusCodeException exception = await Assert.ThrowsAsync<HttpStatusCodeException>(async () => await userService.GetDisplayName("test_username2"));
+        }
+
         /* For update profile */
         private Mock<IDataContext> _mockDataContext;
         private Mock<IUserRepository>? _mockUserRepoForUpdateProfileTest;
