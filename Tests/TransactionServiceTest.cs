@@ -130,6 +130,14 @@ namespace Tests
             AssertExactlyOneCreateTransactionRequestAdded();
         }
 
+        [Fact]
+        public async void CreateTransaction_InvalidRequest_InssuficientBalance()
+        {
+            Initialize();
+            CreateTransactionRequestDTO request = GetInvalidCreateTransactionRequest();
+            HttpStatusCodeException exception = await Assert.ThrowsAsync<HttpStatusCodeException>(() => CreateTransaction(request));
+        }
+
         private CreateTransactionRequestDTO GetValidCreateTransactionRequest()
         {
             CreateTransactionRequestDTO request = new()
@@ -143,9 +151,28 @@ namespace Tests
             return request;
         }
 
+        private CreateTransactionRequestDTO GetInvalidCreateTransactionRequest()
+        {
+            CreateTransactionRequestDTO request = new()
+            {
+                FromUserId = 1234,
+                ToUserId = 1235,
+                Amount = 50000
+            };
+
+            MakeCreateTransactionInvalid(request);
+            return request;
+        }
+
         private void MakeCreateTransactionValid(CreateTransactionRequestDTO request)
         {
             MakeUserIdAuthenticated(request.FromUserId, 55000);
+            MakeUserIdAuthenticated(request.ToUserId, 5000);
+        }
+
+        private void MakeCreateTransactionInvalid(CreateTransactionRequestDTO request)
+        {
+            MakeUserIdAuthenticated(request.FromUserId, 0);
             MakeUserIdAuthenticated(request.ToUserId, 5000);
         }
 
