@@ -298,6 +298,50 @@ namespace Tests
             HttpStatusCodeException exception = await Assert.ThrowsAsync<HttpStatusCodeException>(async () => await userService.GetProfile(2));
         }
 
+        [Fact]
+        public async void GetDisplayName_ValidData_ReturnsSuccess()
+        {
+            // Arrange
+            var mockDataContext = new Mock<IDataContext>();
+            var mockUserRepo = new Mock<IUserRepository>();
+            var mockLevelRepo = new Mock<ILevelRepository>();
+            var mapperConfig = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new AutoMapperProfile());
+            });
+            var mapper = new Mapper(mapperConfig);
+            var mockJwtUtil = new Mock<IJwtUtils>();
+            var mockBcryptWrapper = new Mock<IBcryptWrapper>();
+
+            User user = new User()
+            {
+                Id = 1,
+                UserName = "test_username",
+                Email = "test_email@email.com",
+                DisplayName = "Test Name",
+                Balance = 10000,
+                Exp = 10,
+                LevelId = 1,
+                EncryptedPassword = "testEncrypt",
+                Type = User.LoginType.Standard,
+                Role = User.UserRole.Customer
+            };
+
+            mockUserRepo.Setup(p => p.GetByUsername(user.UserName)).ReturnsAsync((User)user);
+
+            var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
+                mockJwtUtil.Object, mockBcryptWrapper.Object);
+
+            // Act
+            GetDisplayNameResponseDTO resDTO = await userService.GetDisplayName(user.UserName);
+
+            // Assert
+            mockUserRepo.Verify(p => p.GetByUsername(user.UserName), Times.Once());
+            Assert.Equal(user.Id.ToString(), resDTO.Id.ToString());
+            Assert.Equal(user.UserName.ToString(), resDTO.UserName.ToString());
+            Assert.Equal(user.DisplayName.ToString(), resDTO.DisplayName.ToString());
+        }
+
         /* For update profile */
         private Mock<IDataContext> _mockDataContext;
         private Mock<IUserRepository>? _mockUserRepoForUpdateProfileTest;
