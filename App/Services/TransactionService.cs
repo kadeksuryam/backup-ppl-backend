@@ -54,6 +54,9 @@ namespace App.Services
 
             var transaction = _mapper.Map<TransactionHistory>(dto);
 
+            transaction.From = user;
+            transaction.To = targetUser;
+
             DateTime dateTime = DateTime.Now;
 
             transaction.CreatedAt = dateTime;

@@ -105,6 +105,7 @@ namespace Tests
             mockUser = new();
             mockUser.Id = userId;
             mockUser.Balance = 0;
+            mockUser.Exp = 0;
             mockUserRepo!.Setup(repo => repo.GetById(userId)).ReturnsAsync(mockUser);
         }
         private DateTime ParseToDateTime(string dateString)
@@ -121,6 +122,7 @@ namespace Tests
             BankTopUpResponseDTO response = await MakeBankTopUp(request);
             AssertValidBankTopUpResponse(response);
             AssertExactlyOneBankTopUpRequestAdded();
+            AssertExactlyOneAddExpRequestAdded();
         }
 
         private BankTopUpRequestDTO GetValidBankTopUpRequest()
@@ -204,6 +206,7 @@ namespace Tests
             AssertExactlyOneVoucherUsage();
             AssertExactlyOneUserUpdate();
             AssertExactlyOneTopUpHistoryAdded();
+            AssertExactlyOneAddExpRequestAdded();
         }
 
         private VoucherTopUpRequestDTO GetValidVoucherTopUpRequest()
@@ -323,6 +326,14 @@ namespace Tests
                 firstUpdateTime = secondUpdateTime;
                 responseIndex++;
             }
+        }
+
+        private void AssertExactlyOneAddExpRequestAdded()
+        {
+            mockUserService!.Verify(
+                s => s.AddExp(It.IsAny<User>(), It.Is<uint>(i => i > 0)),
+                Times.Once
+            );
         }
     }
 }
