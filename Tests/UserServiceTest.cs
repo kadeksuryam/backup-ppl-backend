@@ -202,6 +202,42 @@ namespace Tests
             mockJwtUtil.Verify(p => p.GenerateToken(user), Times.Once());
         }
 
+        private User InitializeUser(Mock<IUserRepository> mockUserRepo)
+        {
+            User user = new User()
+            {
+                Id = 1,
+                UserName = "test_username",
+                Email = "test_email@email.com",
+                DisplayName = "Test Name",
+                Balance = 10000,
+                Exp = 10,
+                LevelId = 1,
+                EncryptedPassword = "testEncrypt",
+                Type = User.LoginType.Standard,
+                Role = User.UserRole.Customer
+            };
+
+            mockUserRepo.Setup(p => p.GetById(user.Id)).ReturnsAsync((User)user);
+            mockUserRepo.Setup(p => p.GetByUsername(user.UserName)).ReturnsAsync((User)user);
+
+            return user;
+        }
+
+        private Level InitializeLevel(Mock<ILevelRepository> mockLevelRepo)
+        {
+            Level level = new Level()
+            {
+                Id = 1,
+                Name = "Bronze",
+                RequiredExp = 0
+            };
+
+            mockLevelRepo.Setup(p => p.GetById(level.Id)).ReturnsAsync((Level)level);
+
+            return level;
+        }
+
         [Fact]
         public async void GetProfile_ValidData_ReturnsSuccess()
         {
@@ -217,45 +253,25 @@ namespace Tests
             var mockJwtUtil = new Mock<IJwtUtils>();
             var mockBcryptWrapper = new Mock<IBcryptWrapper>();
 
-            User user = new User()
-            {
-                Id = 1,
-                UserName = "test_username",
-                Email = "test_email@email.com",
-                DisplayName = "Test Name",
-                Balance = 10000,
-                Exp = 10,
-                LevelId = 1,
-                EncryptedPassword = "testEncrypt",
-                Type = User.LoginType.Standard,
-                Role = User.UserRole.Customer
-            };
-            Level level = new Level()
-            {
-                Id = 1,
-                Name = "Bronze",
-                RequiredExp = 0
-            };
-
-            mockUserRepo.Setup(p => p.GetById(user.Id)).ReturnsAsync((User)user);
-            mockLevelRepo.Setup(p => p.GetById(user.LevelId)).ReturnsAsync((Level)level);
+            User user = InitializeUser(mockUserRepo);
+            Level level = InitializeLevel(mockLevelRepo);
 
             var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act
-            GetProfileResponseDTO resDTO = await userService.GetProfile(1);
+            GetProfileResponseDTO resDTO = await userService.GetProfile(user.Id);
 
             // Assert
             mockUserRepo.Verify(p => p.GetById(user.Id), Times.Once());
             Assert.Equal(user.Id.ToString(), resDTO.Id.ToString());
             Assert.Equal(user.UserName.ToString(), resDTO.UserName.ToString());
             Assert.Equal(user.Email.ToString(), resDTO.Email.ToString());
-            Assert.Equal("Bronze", resDTO.Level.ToString());
+            Assert.Equal(level.Name, resDTO.Level.ToString());
         }
 
         [Fact]
-        public async void GetProfile_InvalidData()
+        public async void GetProfile_InvalidData_ReturnsException()
         {
             // Arrange
             var mockDataContext = new Mock<IDataContext>();
@@ -269,32 +285,13 @@ namespace Tests
             var mockJwtUtil = new Mock<IJwtUtils>();
             var mockBcryptWrapper = new Mock<IBcryptWrapper>();
 
-            User user = new User()
-            {
-                Id = 1,
-                UserName = "test_username",
-                Email = "test_email@email.com",
-                DisplayName = "Test Name",
-                Balance = 10000,
-                Exp = 10,
-                LevelId = 1,
-                EncryptedPassword = "testEncrypt",
-                Type = User.LoginType.Standard,
-                Role = User.UserRole.Customer
-            };
-            Level level = new Level()
-            {
-                Id = 1,
-                Name = "Bronze",
-                RequiredExp = 0
-            };
-
-            mockUserRepo.Setup(p => p.GetById(user.Id)).ReturnsAsync((User)user);
-            mockLevelRepo.Setup(p => p.GetById(user.LevelId)).ReturnsAsync((Level)level);
+            User user = InitializeUser(mockUserRepo);
+            Level level = InitializeLevel(mockLevelRepo);
 
             var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
+            /* User with User Id 2 is not found, so will throws an error */
             HttpStatusCodeException exception = await Assert.ThrowsAsync<HttpStatusCodeException>(async () => await userService.GetProfile(2));
         }
 
@@ -313,21 +310,7 @@ namespace Tests
             var mockJwtUtil = new Mock<IJwtUtils>();
             var mockBcryptWrapper = new Mock<IBcryptWrapper>();
 
-            User user = new User()
-            {
-                Id = 1,
-                UserName = "test_username",
-                Email = "test_email@email.com",
-                DisplayName = "Test Name",
-                Balance = 10000,
-                Exp = 10,
-                LevelId = 1,
-                EncryptedPassword = "testEncrypt",
-                Type = User.LoginType.Standard,
-                Role = User.UserRole.Customer
-            };
-
-            mockUserRepo.Setup(p => p.GetByUsername(user.UserName)).ReturnsAsync((User)user);
+            User user = InitializeUser(mockUserRepo);
 
             var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
@@ -343,7 +326,7 @@ namespace Tests
         }
 
         [Fact]
-        public async void GetDisplayName_InvalidData()
+        public async void GetDisplayName_InvalidData_ReturnsException()
         {
             // Arrange
             var mockDataContext = new Mock<IDataContext>();
@@ -357,27 +340,14 @@ namespace Tests
             var mockJwtUtil = new Mock<IJwtUtils>();
             var mockBcryptWrapper = new Mock<IBcryptWrapper>();
 
-            User user = new User()
-            {
-                Id = 1,
-                UserName = "test_username",
-                Email = "test_email@email.com",
-                DisplayName = "Test Name",
-                Balance = 10000,
-                Exp = 10,
-                LevelId = 1,
-                EncryptedPassword = "testEncrypt",
-                Type = User.LoginType.Standard,
-                Role = User.UserRole.Customer
-            };
-
-            mockUserRepo.Setup(p => p.GetByUsername(user.UserName)).ReturnsAsync((User)user);
+            User user = InitializeUser(mockUserRepo);
 
             var userService = new UserService(mockDataContext.Object, mockUserRepo.Object, mockLevelRepo.Object, mapper,
                 mockJwtUtil.Object, mockBcryptWrapper.Object);
 
             // Act
-            HttpStatusCodeException exception = await Assert.ThrowsAsync<HttpStatusCodeException>(async () => await userService.GetDisplayName("test_username2"));
+            /* User with username "invalid_username" is not found, so this will throw an error */
+            HttpStatusCodeException exception = await Assert.ThrowsAsync<HttpStatusCodeException>(async () => await userService.GetDisplayName("invalid_username"));
         }
 
         /* For update profile */

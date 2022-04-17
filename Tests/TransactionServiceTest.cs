@@ -73,11 +73,11 @@ namespace Tests
         private uint GetAuthenticatedUserId()
         {
             uint userId = 1234;
-            MakeUserIdAuthenticated(userId);
+            InitializeMockUser(userId);
             return userId;
         }
 
-        private void MakeUserIdAuthenticated(uint userId, uint balance = 0, uint exp = 0)
+        private void InitializeMockUser(uint userId, uint balance = 0, uint exp = 0)
         {
             mockUser = new();
             mockUser.Id = userId;
@@ -125,9 +125,10 @@ namespace Tests
         public async void CreateTransaction_ValidRequest_ReturnsSuccessAsync()
         {
             Initialize();
-            CreateTransactionRequestDTO request = GetValidCreateTransactionRequest();
+            CreateTransactionRequestDTO request = InitializeCreateTransactionRequest();
+            MakeCreateTransactionValid(request);
             CreateTransactionResponseDTO response = await CreateTransaction(request);
-            AssertValidCreateTransactionResponse(response);
+            AssertValidCreateTransactionResponse(request, response);
             AssertExactlyOneCreateTransactionRequestAdded();
             AssertExactlyOneAddExpRequestAdded();
         }
@@ -136,11 +137,12 @@ namespace Tests
         public async void CreateTransaction_InvalidRequest_InssuficientBalance()
         {
             Initialize();
-            CreateTransactionRequestDTO request = GetInvalidCreateTransactionRequest();
+            CreateTransactionRequestDTO request = InitializeCreateTransactionRequest();
+            MakeCreateTransactionInvalid(request);
             HttpStatusCodeException exception = await Assert.ThrowsAsync<HttpStatusCodeException>(() => CreateTransaction(request));
         }
 
-        private CreateTransactionRequestDTO GetValidCreateTransactionRequest()
+        private CreateTransactionRequestDTO InitializeCreateTransactionRequest()
         {
             CreateTransactionRequestDTO request = new()
             {
@@ -149,33 +151,21 @@ namespace Tests
                 Amount = 50000
             };
 
-            MakeCreateTransactionValid(request);
             return request;
         }
 
-        private CreateTransactionRequestDTO GetInvalidCreateTransactionRequest()
-        {
-            CreateTransactionRequestDTO request = new()
-            {
-                FromUserId = 1234,
-                ToUserId = 1235,
-                Amount = 50000
-            };
-
-            MakeCreateTransactionInvalid(request);
-            return request;
-        }
-
+        /* Create users for making a transaction */
         private void MakeCreateTransactionValid(CreateTransactionRequestDTO request)
         {
-            MakeUserIdAuthenticated(request.FromUserId, 55000);
-            MakeUserIdAuthenticated(request.ToUserId, 5000);
+            InitializeMockUser(request.FromUserId, 55000);
+            InitializeMockUser(request.ToUserId, 5000);
         }
 
+        /* Create an user with zero balance, so the transaction will be invalid */
         private void MakeCreateTransactionInvalid(CreateTransactionRequestDTO request)
         {
-            MakeUserIdAuthenticated(request.FromUserId, 0);
-            MakeUserIdAuthenticated(request.ToUserId, 5000);
+            InitializeMockUser(request.FromUserId, 0);
+            InitializeMockUser(request.ToUserId, 5000);
         }
 
         private async Task<CreateTransactionResponseDTO> CreateTransaction(CreateTransactionRequestDTO request)
@@ -183,17 +173,14 @@ namespace Tests
             return await service!.CreateTransaction(request);
         }
 
-        private void AssertValidCreateTransactionResponse(CreateTransactionResponseDTO response)
+        private void AssertValidCreateTransactionResponse(CreateTransactionRequestDTO request, CreateTransactionResponseDTO response)
         {
-            Assert.Equal(response.From!.Id.ToString(), 1234.ToString());
-            Assert.Equal(response.To!.Id.ToString(), 1235.ToString());
+            Assert.Equal(response.From!.Id.ToString(), request.FromUserId.ToString());
+            Assert.Equal(response.To!.Id.ToString(), request.ToUserId.ToString());
 
-            Assert.Equal(response.Amount.ToString(), 50000.ToString());
-            Assert.Equal(response.From!.CurrentBalance.ToString(), 5000.ToString());
-            Assert.Equal(response.To!.CurrentBalance.ToString(), 55000.ToString());
-
-            Assert.Equal(response.From!.PreviousBalance.ToString(), 55000.ToString());
-            Assert.Equal(response.To!.PreviousBalance.ToString(), 5000.ToString());
+            Assert.Equal(response.Amount.ToString(), request.Amount.ToString());
+            Assert.Equal(response.From!.CurrentBalance.ToString(), (response.From!.PreviousBalance - request.Amount).ToString());
+            Assert.Equal(response.To!.CurrentBalance.ToString(), (response.To!.PreviousBalance + request.Amount).ToString());
         }
 
         private void AssertExactlyOneCreateTransactionRequestAdded()
