@@ -66,6 +66,8 @@ namespace App.Helpers
             CreateMap<User, GetTopUpHistoryResponseDTO.UserDTO>();
             CreateMap<Voucher, GetTopUpHistoryResponseDTO.VoucherDTO>();
             CreateMap<Bank, GetTopUpHistoryResponseDTO.BankDTO>();
+            CreateMap<AddBankRequestDTO, Bank>();
+            CreateMap<Bank, GetAllBankResponseDTO.BankDTO>();
         }
     }
 }
