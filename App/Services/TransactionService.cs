@@ -126,7 +126,6 @@ namespace App.Services
 
             foreach (var history in histories)
             {
-                System.Console.WriteLine(history);
                 TransactionHistoryDTO dto = new TransactionHistoryDTO()
                 {
                     Id = history.Id,

@@ -45,6 +45,7 @@ var builder = WebApplication.CreateBuilder(args);
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<ITopUpService, TopUpService>();
     services.AddScoped<IBcryptWrapper, BcryptWrapper>();
+    services.AddScoped<IBankService, BankService>();
     services.AddAutoMapper(typeof(Program));
 
 
