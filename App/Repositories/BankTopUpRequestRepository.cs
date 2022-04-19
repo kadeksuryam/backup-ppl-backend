@@ -48,5 +48,14 @@ namespace App.Repositories
                 .Include(b => b.From)
                 .FirstAsync(); 
         }
+
+        public async Task<IEnumerable<BankTopUpRequest?>> GetByUserId(uint userId, RequestStatus? requestStatus)
+        {
+            return await _context.BankTopUpRequests
+                .Include(b => b.Bank)
+                .Include(b => b.From)
+                .Where(b => (b.From!.Id == userId) && b.Status.Equals(requestStatus))
+                .ToListAsync();
+        }
     }
 }

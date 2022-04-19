@@ -13,5 +13,6 @@ namespace App.Services
         Task<List<TopUpHistoryResponseDTO>> GetTopUpHistoriesByUser(uint userId);
         Task UpdateBankTopUpRequest(UpdateTopUpRequestStatusRequestDTO dto);
         Task<GetTopUpHistoryResponseDTO> GetHistoryTransaction(PagingParameters getAllParam);
+        Task<List<GetBankTopUpRequestResponseDTO>> GetAllBankTopUpRequestByUserId(uint userId, RequestStatus? requestStatus);
     }
 }
