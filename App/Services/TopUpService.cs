@@ -274,5 +274,29 @@ namespace App.Services
 
             return res;
         }
+
+        public async Task<List<GetBankTopUpRequestResponseDTO>> GetAllBankTopUpRequestByUserId(uint userId, RequestStatus? requestStatus)
+        {
+
+            IEnumerable<BankTopUpRequest?> dbRequests = await _bankTopUpRequestRepository.GetByUserId(userId, requestStatus);
+            List<GetBankTopUpRequestResponseDTO> response = new List<GetBankTopUpRequestResponseDTO>();
+
+            foreach (var request in dbRequests)
+            {
+                GetBankTopUpRequestResponseDTO dto = new GetBankTopUpRequestResponseDTO()
+                {
+                    Id = request!.Id,
+                    CreatedAt = request.CreatedAt,
+                    UpdatedAt = request.UpdatedAt,
+                    ExpiredDate = request.ExpiredDate,
+                    Amount = request.Amount,
+                    Bank = _mapper.Map<GetBankTopUpRequestResponseDTO.BankDTO>(request.Bank),
+                    From = _mapper.Map<GetBankTopUpRequestResponseDTO.UserDTO>(request.From),
+                    Status = request.Status.ToString()
+                };
+                response.Add(dto);
+            }
+            return response;
+        }
     }
 }

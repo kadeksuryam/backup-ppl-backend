@@ -10,5 +10,6 @@ namespace App.Repositories
         Task<IEnumerable<BankTopUpRequest>> GetAll(RequestStatus? requestStatus);
         Task<BankTopUpRequest> Update(BankTopUpRequest entity);
         Task<BankTopUpRequest?> Get(uint id);
+        Task<IEnumerable<BankTopUpRequest?>> GetByUserId(uint userId, RequestStatus? requestStatus);
     }
 }

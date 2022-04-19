@@ -113,5 +113,22 @@ namespace App.Controllers
             });
 
         }
+
+        [Authorize(Role = "Customer")]
+        [HttpGet("requests/{userId}")]
+        public async Task<IActionResult> Get(uint userId, [FromQuery][BindRequired] string status)
+        {
+            VerifyUserId(userId);
+
+            if (!Enum.TryParse(status, out RequestStatus requestStatus))
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid request status");
+            };
+
+            return Ok(new SuccessDetails()
+            {
+                Data = await _topUpService.GetAllBankTopUpRequestByUserId(userId, requestStatus)
+            }) ;
+        }
     }
 }
