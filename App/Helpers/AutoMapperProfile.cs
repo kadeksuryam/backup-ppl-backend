@@ -55,7 +55,10 @@ namespace App.Helpers
             CreateMap<TopUpHistory, TopUpHistoryResponseDTO>()
                 .ForMember(dest =>
                     dest.Method, opt => opt.MapFrom(src =>
-                        src.Method.ToString()));
+                        src.Method.ToString()))
+                .ForMember(dest =>
+                    dest.Status, opt => opt.MapFrom(src =>
+                        src.BankRequest!.Status));
 
             CreateMap<TransactionHistory, TransactionHistoryResponseDTO>()
                 .ForMember(dest =>

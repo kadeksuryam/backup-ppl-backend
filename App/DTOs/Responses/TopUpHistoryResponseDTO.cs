@@ -28,5 +28,8 @@ namespace App.DTOs.Responses
 
         [JsonPropertyName("voucher_code")]
         public string VoucherCode { get; set; } = "";
+
+        [JsonPropertyName("status")]
+        public string Status { get; set; } = "";
     }
 }
