@@ -22,6 +22,7 @@ namespace App.Repositories
         public async Task<IEnumerable<TopUpHistory>> GetAllByUserId(uint userId)
         {
             return await _context.TopUpHistories
+                .Include(b => b.BankRequest)
                 .Where(history => history.FromUserId == userId)
                 .ToListAsync();
         }
