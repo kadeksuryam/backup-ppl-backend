@@ -11,7 +11,6 @@ namespace App.Models.Config
             ConfigureTable(builder);
             ConfigureAttributes(builder);
             ConfigureRelations(builder);
-            AddSeed(builder);
         }
 
         private static void ConfigureTable(EntityTypeBuilder<TransactionHistory> builder)
@@ -75,31 +74,6 @@ namespace App.Models.Config
             builder.HasOne(h => h.To)
                 .WithMany(u => u.TransactionHistoriesTo)
                 .HasForeignKey(h => h.ToUserId);
-        }
-
-
-        private void AddSeed(EntityTypeBuilder<TransactionHistory> builder)
-        {
-            builder.HasData(new TransactionHistory
-            {
-                Id = 1,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                FromUserId = 1,
-                ToUserId = 2,
-                Status = TransactionHistory.TransactionStatus.Success,
-                Amount = 5000
-            },
-            new TransactionHistory
-            {
-                Id = 2,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                FromUserId = 2,
-                ToUserId = 1,
-                Status = TransactionHistory.TransactionStatus.Success,
-                Amount = 5000
-            });
         }
     }
 }

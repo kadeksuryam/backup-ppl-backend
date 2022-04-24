@@ -11,7 +11,6 @@ namespace App.Models.Config
             ConfigureTable(builder);
             ConfigureAttributes(builder);
             ConfigureRelations(builder);
-            AddSeed(builder);
         }
 
         private static void ConfigureTable(EntityTypeBuilder<TopUpHistory> builder)
@@ -99,30 +98,6 @@ namespace App.Models.Config
             builder.HasOne(h => h.Voucher)
                 .WithOne(r => r.History)
                 .HasForeignKey<TopUpHistory>(h => h.VoucherId);
-        }
-
-        private void AddSeed(EntityTypeBuilder<TopUpHistory> builder)
-        {
-            builder.HasData(new TopUpHistory
-            {
-                Id = 1,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                FromUserId = 1,
-                Amount = 5000,
-                Method = TopUpHistory.TopUpMethod.Voucher,
-                VoucherId = 1,
-            },
-            new TopUpHistory
-            {
-                Id = 2,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                FromUserId = 1,
-                Amount = 50000,
-                Method = TopUpHistory.TopUpMethod.Bank,
-                BankRequestId = 1,
-            });
         }
     }
 }
