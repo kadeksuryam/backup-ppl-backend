@@ -7,7 +7,6 @@ using System.Net;
 
 namespace App.Controllers
 {
-    [Authorize(Role = "Customer")]
     [ApiController]
     [Route("voucher")]
     public class VoucherController : ControllerBase
@@ -19,6 +18,7 @@ namespace App.Controllers
             _voucherService = voucherService;
         }
 
+        [Authorize(Role = "Customer")]
         [HttpGet("{code}")]
         public async Task<IActionResult> GetByCode(string code)
         {
@@ -30,10 +30,11 @@ namespace App.Controllers
             });
         }
 
+        [Authorize(Role = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddVoucher([FromBody] AddVoucherRequestDTO reqDTO)
         {
-            if(reqDTO.Code.Length < 12)
+            if(reqDTO.Code.Length != 12)
             {
                 throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid voucher code length");
             }
