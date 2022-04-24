@@ -46,7 +46,7 @@ namespace App.Helpers
                 .ForMember(dest =>
                     dest.CreatedAt, opt => opt.MapFrom(src => src.UpdatedAt))
                 .ForMember(dest =>
-                    dest.Method, opt => opt.Equals(TopUpHistory.TopUpMethod.Voucher))
+                    dest.Method, opt => opt.MapFrom(src => TopUpHistory.TopUpMethod.Voucher))
                 .ForMember(dest =>
                     dest.VoucherId,
                     opt => opt.MapFrom(src => src.Id));
