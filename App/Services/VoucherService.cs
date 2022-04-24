@@ -4,6 +4,7 @@ using App.DTOs.Responses;
 using AutoMapper;
 using App.Helpers;
 using System.Net;
+using App.DTOs.Requests;
 
 namespace App.Services
 {
@@ -50,6 +51,20 @@ namespace App.Services
             voucher.UpdatedAt = DateTime.Now;
             Voucher updatedVoucher = await _voucherRepository.Update(voucher);
             return updatedVoucher;
+        }
+
+        public async Task AddVoucher(AddVoucherRequestDTO dto)
+        {
+            Voucher? voucher = await _voucherRepository.GetByCode(dto.Code);
+
+            if (voucher != null)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.UnprocessableEntity, "Voucher code must be unique");
+            }
+
+            Voucher voucherSave = _mapper.Map<Voucher>(dto);
+
+            await _voucherRepository.Add(voucherSave);
         }
     }
 }

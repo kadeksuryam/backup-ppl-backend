@@ -22,5 +22,12 @@ namespace App.Repositories
             await _context.SaveChangesAsync();
             return entity;
         }
+
+        public async Task<Voucher> Add(Voucher entity)
+        {
+            _context.Vouchers.Add(entity);
+            await _context.SaveChangesAsync();
+            return entity;
+        }
     }
 }
