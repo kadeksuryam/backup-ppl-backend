@@ -7,5 +7,6 @@ namespace App.Repositories
         Task<Voucher?> GetByCode(String code);
 
         Task<Voucher> Update(Voucher entity);
+        Task<Voucher> Add(Voucher entity);
     }
 }

@@ -71,6 +71,13 @@ namespace App.Helpers
             CreateMap<Bank, GetTopUpHistoryResponseDTO.BankDTO>();
             CreateMap<AddBankRequestDTO, Bank>();
             CreateMap<Bank, GetAllBankResponseDTO.BankDTO>();
+            CreateMap<AddVoucherRequestDTO, Voucher>()
+                .ForMember(dest =>
+                    dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
+                .ForMember(dest =>
+                    dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.Now))
+                .ForMember(dest =>
+                    dest.IsUsed, opt => opt.MapFrom(src => false));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using App.Authorization;
+using App.DTOs.Requests;
 using App.Helpers;
 using App.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -26,6 +27,22 @@ namespace App.Controllers
             return Ok(new SuccessDetails()
             {
                 Data = voucher
+            });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddVoucher([FromBody] AddVoucherRequestDTO reqDTO)
+        {
+            if(reqDTO.Code.Length < 12)
+            {
+                throw new HttpStatusCodeException(HttpStatusCode.BadRequest, "Invalid voucher code length");
+            }
+
+            await _voucherService.AddVoucher(reqDTO);
+
+            return Ok(new SuccessDetails()
+            {
+                Data = new { message = "Add new voucher successful" }
             });
         }
     }
