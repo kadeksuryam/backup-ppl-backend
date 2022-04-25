@@ -133,8 +133,6 @@ namespace App.Services
                     TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
                     history.FromUserId = request.UserId;
 
-                    Console.WriteLine("TEST" + history.Id);
-
                     VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
 
                     await _topUpHistoryRepository.Add(history);
@@ -211,9 +209,7 @@ namespace App.Services
                 bankTopUpRequest.UpdatedAt = DateTime.UtcNow;
                 if (requestStatus.Equals(RequestStatus.Success))
                 {
-                    userDb!.Balance += (uint)bankTopUpRequest.Amount;
-                    // increase the EXP?
-                    userDb!.Exp += 100;
+                    await _userService.AddExp(userDb!, (uint)bankTopUpRequest.Amount / 5000);
                 }
                 TopUpHistory topUpHistory = new()
                 {
@@ -227,7 +223,6 @@ namespace App.Services
                 };
                 await _topUpHistoryRepository.Add(topUpHistory);
                 await _bankTopUpRequestRepository.Update(bankTopUpRequest);
-                await _userRepository.Update(userDb);
 
                 _dataContext.SaveChanges();
                 transaction.Commit();
