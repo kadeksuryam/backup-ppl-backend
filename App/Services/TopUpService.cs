@@ -133,6 +133,8 @@ namespace App.Services
                     TopUpHistory history = _mapper.Map<TopUpHistory>(voucher);
                     history.FromUserId = request.UserId;
 
+                    Console.WriteLine("TEST" + history.Id);
+
                     VoucherTopUpResponseDTO response = _mapper.Map<VoucherTopUpResponseDTO>(voucher);
 
                     await _topUpHistoryRepository.Add(history);
