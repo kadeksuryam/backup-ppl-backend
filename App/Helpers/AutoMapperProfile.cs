@@ -44,6 +44,8 @@ namespace App.Helpers
             CreateMap<Voucher, VoucherTopUpResponseDTO>();
             CreateMap<Voucher, TopUpHistory>()
                 .ForMember(dest =>
+                    dest.Id, src => src.Ignore())
+                .ForMember(dest =>
                     dest.CreatedAt, opt => opt.MapFrom(src => src.UpdatedAt))
                 .ForMember(dest =>
                     dest.Method, opt => opt.MapFrom(src => TopUpHistory.TopUpMethod.Voucher))
