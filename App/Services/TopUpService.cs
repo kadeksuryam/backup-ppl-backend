@@ -65,7 +65,7 @@ namespace App.Services
                     await _bankTopUpRequestRepository.Add(topUpRequest);
 
                     var user = await _userRepository.GetById(requestDto.UserId);
-                    await _userService.AddExp(user!, (uint)requestDto.Amount / 5000);
+                    //await _userService.AddExp(user!, (uint)requestDto.Amount / 5000);
 
                     t.Commit();
 
