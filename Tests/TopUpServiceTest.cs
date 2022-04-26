@@ -122,7 +122,7 @@ namespace Tests
             BankTopUpResponseDTO response = await MakeBankTopUp(request);
             AssertValidBankTopUpResponse(response);
             AssertExactlyOneBankTopUpRequestAdded();
-            AssertExactlyOneAddExpRequestAdded();
+            //AssertExactlyOneAddExpRequestAdded();
         }
 
         private BankTopUpRequestDTO GetValidBankTopUpRequest()
