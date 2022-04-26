@@ -209,6 +209,7 @@ namespace App.Services
                 bankTopUpRequest.UpdatedAt = DateTime.UtcNow;
                 if (requestStatus.Equals(RequestStatus.Success))
                 {
+                    userDb!.Balance += (uint)bankTopUpRequest.Amount;
                     await _userService.AddExp(userDb!, (uint)bankTopUpRequest.Amount / 5000);
                 }
                 TopUpHistory topUpHistory = new()
@@ -223,6 +224,7 @@ namespace App.Services
                 };
                 await _topUpHistoryRepository.Add(topUpHistory);
                 await _bankTopUpRequestRepository.Update(bankTopUpRequest);
+                await _userRepository.Update(userDb);
 
                 _dataContext.SaveChanges();
                 transaction.Commit();
